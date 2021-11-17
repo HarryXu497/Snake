@@ -15,12 +15,25 @@ gameWindow = pygame.display.set_mode((WIDTH,HEIGHT))
 TOP = 0
 BOTTOM = HEIGHT
 MIDDLE = WIDTH//2
+
+# Colours
 WHITE = (255,255,255)
 BLACK = (  0,  0,  0)
 BLUE = (0, 0, 255)
 RED = (247, 27, 27)
-BLOCK_SIZE = 25
+GREY = (30, 30, 30)
+LGREY = (140, 140, 140)
 
+LCOLOUR = WHITE
+NCOLOUR = WHITE
+SCOLOUR = WHITE
+VSCOLOUR = WHITE
+
+BLOCK_SIZE = 25
+ROUNDEDNESS = int((BLOCK_SIZE * 3)//25)
+
+BLOCK_X = WIDTH//BLOCK_SIZE
+BLOCK_Y = HEIGHT//BLOCK_SIZE
 
 BLOCK_R = 72
 BLOCK_G = 0
@@ -31,6 +44,7 @@ score = 0
 
 # Fonts
 scoreFont = pygame.font.SysFont("Bahnschrift", 30)
+menuFontLarge = pygame.font.Font("fonts/MENUFONT.ttf", 60)
 menuFont = pygame.font.Font("fonts/MENUFONT.ttf", 40)
 menuFont2 = pygame.font.Font("fonts/MENUFONT.ttf", 20)
 
@@ -43,24 +57,33 @@ pygame.display.set_icon(icon)
 FPS = 60
 fpsClock = pygame.time.Clock()
 timeElapsed = 0
+lastApple = 0
+delay = 70
 
 #---------------------------------------#
 # functions                             #
 #---------------------------------------#
 def redrawGameWindow():
-    global appleGenerated, timeElapsed
+    global appleGenerated, timeElapsed, lastApple
     BLOCK_R = 72
     BLOCK_G = 0
     BLOCK_B = 255
     pygame.event.clear()
     gameWindow.fill(BLACK)
-    
+
+    for i in range(round(BLOCK_X)):
+        pygame.draw.rect(gameWindow, GREY, (i * BLOCK_SIZE, 0, 1, HEIGHT))
+
+    for i in range(round(BLOCK_Y)):
+        pygame.draw.rect(gameWindow, GREY, (0, i * BLOCK_SIZE, WIDTH, 1))    
+
+
     for i in range(len(blocksX)):
         
         SEG_COLOUR = (BLOCK_R, BLOCK_G, BLOCK_B)
         coord_x = blocksX[i]
         coord_y = blocksY[i]
-        pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 0, 3)
+        pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 0, ROUNDEDNESS)
         if BLOCK_R + 20 <= 255:
             BLOCK_R += 10
         if BLOCK_G + 20 <= 255:
@@ -74,18 +97,105 @@ def redrawGameWindow():
     if not appleGenerated:
         generateApple()
         appleGenerated = True
-
+    
     scoreRender = scoreFont.render(f"{score}", True, WHITE)
     gameWindow.blit(scoreRender, (770, 10))
-
+    
     displayTime(timeElapsed, 10, 10)
     time = fpsClock.tick(FPS)
     timeElapsed += time / 1000
+    lastApple += time / 1000
+    
+    if lastApple >= 30:
+        appleGenerated = False
+        lastApple = 0
     
     pygame.display.update()
     BLOCK_R = 72
     BLOCK_G = 0
     BLOCK_B = 255
+
+
+def drawMenu(mousePos, clicked):
+    pygame.event.clear()
+    gameWindow.fill(BLACK)
+    global LCOLOUR, NCOLOUR, SCOLOUR, VSCOLOUR, menu, BLOCK_SIZE
+
+    titleRender = menuFontLarge.render("Grid Size", True, WHITE)
+    gameWindow.blit(titleRender, (260, 20))
+    
+    
+    largeButton = pygame.draw.rect(gameWindow, LCOLOUR, (100, 120, 250, 150), 4)
+    normalButton = pygame.draw.rect(gameWindow, NCOLOUR, (100, 370, 250, 150), 4)
+    smallButton = pygame.draw.rect(gameWindow, SCOLOUR, (450, 120, 250, 150), 4)
+    verySmallButton = pygame.draw.rect(gameWindow, VSCOLOUR, (450, 370, 250, 150), 4)
+
+    # Buttons
+    LargeGridRender = menuFont.render("Large", True, WHITE)
+    LargeGridRenderSub = menuFont2.render("16 x 12", True, WHITE)
+    gameWindow.blit(LargeGridRender, (165, 150))
+    gameWindow.blit(LargeGridRenderSub, (185, 205))
+
+    LargeGridRender = menuFont.render("Normal", True, WHITE)
+    LargeGridRenderSub = menuFont2.render("32 x 24", True, WHITE)
+    gameWindow.blit(LargeGridRender, (500, 150))
+    gameWindow.blit(LargeGridRenderSub, (535, 205))
+
+    normalGridRender = menuFont.render("Small", True, WHITE)
+    normalGridRenderSub = menuFont2.render("64 x 48", True, WHITE)
+    gameWindow.blit(normalGridRender, (165, 400))
+    gameWindow.blit(normalGridRenderSub, (185, 455))
+
+    LargeGridRender = menuFont.render("Very Small", True, WHITE)
+    LargeGridRenderSub = menuFont2.render("80 x 60", True, WHITE)
+    gameWindow.blit(LargeGridRender, (460, 400))
+    gameWindow.blit(LargeGridRenderSub, (515, 455))
+
+    # Large button
+    if largeButton.collidepoint(mousePos):
+        LCOLOUR = LGREY
+
+    if not largeButton.collidepoint(mousePos):
+        LCOLOUR = WHITE
+
+    if largeButton.collidepoint(mousePos) and clicked:
+        BLOCK_SIZE = 40
+        menu = False
+
+    # Normal button
+    if normalButton.collidepoint(mousePos):
+        NCOLOUR = LGREY
+
+    if not normalButton.collidepoint(mousePos):
+        NCOLOUR = WHITE
+
+    if normalButton.collidepoint(mousePos) and clicked:
+        BLOCK_SIZE = 12.5
+        menu = False
+
+    # Small button
+    if smallButton.collidepoint(mousePos):
+        SCOLOUR = LGREY
+
+    if not smallButton.collidepoint(mousePos):
+        SCOLOUR = WHITE
+
+    if smallButton.collidepoint(mousePos) and clicked:
+        BLOCK_SIZE = 25
+        menu = False
+        
+    # Very Small button
+    if verySmallButton.collidepoint(mousePos):
+        VSCOLOUR = LGREY
+
+    if not verySmallButton.collidepoint(mousePos):
+        VSCOLOUR = WHITE
+
+    if verySmallButton.collidepoint(mousePos) and clicked:
+        BLOCK_SIZE = 10
+        menu = False
+        
+    pygame.display.update()
 
 
 def checkCollision():
@@ -98,8 +208,9 @@ def checkCollision():
         
 
 def generateApple() -> list:
-    apple_x = randint(0, BLOCK_X)
-    apple_y = randint(0, BLOCK_Y)
+    apple_x = randint(0, BLOCK_X - 1)
+    apple_y = randint(0, BLOCK_Y - 1)
+    # Keeps generating until apple isn't in 
     while (apple_x in blocksX) and (apple_y in blocksY):
         apple_x = randint(0, BLOCK_X)
         apple_y = randint(0, BLOCK_Y)
@@ -109,12 +220,15 @@ def generateApple() -> list:
     
 
 def checkApple() -> bool:
-    global appleX, appleY
+    global appleX, appleY, appleGenerated
     coord_x = blocksX[0]
     coord_y = blocksY[0]
     if coord_x in appleX and coord_y in appleY:
-        appleX.clear()
-        appleY.clear()
+        for i in range(len(appleX) - 1, -1, -1):
+            if appleX[i] == coord_x and appleY[i] == coord_y:
+                del appleX[i]
+                del appleY[i]
+        appleGenerated = False
         return True
     
     return False
@@ -123,6 +237,12 @@ def displayTime(time: float, x: int, y: int):
     str_time = round(time, 1)
     stopwatch = scoreFont.render(f"{str_time}", True, WHITE)
     gameWindow.blit(stopwatch, (x, y))
+
+def checkScore():
+    global score, delay
+    speedMultiplier = score // 3
+    newDelay = 70 - speedMultiplier * 4
+    delay = newDelay
     
 
 #---------------------------------------#
@@ -136,9 +256,6 @@ appleY = []
 # snake's properties
 stepX = 0
 stepY = -1                          
-
-BLOCK_X = WIDTH//BLOCK_SIZE
-BLOCK_Y = HEIGHT//BLOCK_SIZE
 
 head = [BLOCK_X//2, BLOCK_Y//2]
 
@@ -165,9 +282,18 @@ for i in range(4):                      # add coordinates for the head and 3 seg
 #---------------------------------------#
 appleGenerated = False
 inPlay = True
+menu = True
 restart = True
 permaExit = False
 endScreen = False
+
+while menu:
+    mousePos = pygame.mouse.get_pos()
+    mousePressed = pygame.mouse.get_pressed()[0]
+    drawMenu(mousePos, mousePressed)
+
+BLOCK_X = WIDTH//BLOCK_SIZE
+BLOCK_Y = HEIGHT//BLOCK_SIZE
 while restart:
     # reset time
     timeElapsed = 0
@@ -176,26 +302,32 @@ while restart:
     while inPlay:
         pygame.event.clear()
         redrawGameWindow()
-        pygame.time.delay(60)
+        checkScore()
+        pygame.time.delay(delay)
 
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
             inPlay = False
             restart = False
             permaExit = True
-            
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                inPlay = False
+                restart = False
+                permaExit = True
+        
         if keys[pygame.K_LEFT] and DIRECTION != 3:
             MOVE_Q.append(LEFT)
-        if keys[pygame.K_RIGHT] and DIRECTION != 2:
+        elif keys[pygame.K_RIGHT] and DIRECTION != 2:
             MOVE_Q.append(RIGHT)
-        if keys[pygame.K_UP] and DIRECTION != 1:
+        elif keys[pygame.K_UP] and DIRECTION != 1:
             MOVE_Q.append(UP)
-        if keys[pygame.K_DOWN]  and DIRECTION != 0:
+        elif keys[pygame.K_DOWN]  and DIRECTION != 0:
             MOVE_Q.append(DOWN)
                 
         if len(MOVE_Q) >= 1:
             DIRECTION = MOVE_Q.pop(0)
-        
+            
         
         if DIRECTION == LEFT:
             stepX = -1
@@ -210,6 +342,7 @@ while restart:
             stepX = 0
             stepY = 1
 
+
         if checkApple():
             if len(blocksX) <= 1:           
                 blocksX.append(blocksX[-1] - stepX)           
@@ -219,9 +352,7 @@ while restart:
                 change_Y = blocksY[-1] - blocksY[-2]
                 blocksX.append(blocksX[-1] + change_X)
                 blocksY.append(blocksY[-1] + change_Y)
-            appleGenerated = False
             score += 1
-        
         
         # move the segments
 
@@ -244,9 +375,8 @@ while restart:
             inPlay = False
 
         if checkCollision():
+            print("collision")
             inPlay = False
-
-        pygame.time.delay(10)
 
     if not permaExit:
         endScreen = True
@@ -259,9 +389,11 @@ while restart:
     appleY.clear()
     
     score = 0
+    MOVE_Q.clear()
     DIRECTION = UP
     appleGenerated = False
 
+    lastApple = 0
     
     for i in range(4):
         blocksX.append(BLOCK_X//2)
@@ -273,7 +405,7 @@ while restart:
         
         restartButton = pygame.draw.rect(gameWindow, WHITE, (270, 300, 280, 100), 4)
         exitButton = pygame.draw.rect(gameWindow, WHITE, (310, 490, 200, 60), 4)
-        gameWindow.blit(icon, (280, 0))
+        gameWindow.blit(icon, (270, 0))
         restartText = menuFont.render("Play Again?", True, WHITE)
         exitText = menuFont.render("Exit", True, WHITE)
         gameWindow.blit(restartText, (282, 325))
@@ -295,6 +427,12 @@ while restart:
             inPlay = False
             restart = False
             permaExit = True
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                inPlay = False
+                restart = False
+                permaExit = True
+        
             
     
     
