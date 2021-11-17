@@ -52,6 +52,9 @@ menuFont2 = pygame.font.Font("fonts/MENUFONT.ttf", 20)
 icon = pygame.image.load("images/icon.png")
 pygame.display.set_icon(icon)
 
+# Sounds
+pygame.mixer.init()
+pygame.mixer.music.load("sounds/THEME.mp3")
 
 # Timer
 FPS = 60
@@ -131,7 +134,7 @@ def drawMenu(mousePos, clicked):
     verySmallButton = pygame.draw.rect(gameWindow, VSCOLOUR, (450, 370, 250, 150), 4)
 
     # Buttons
-    LargeGridRender = menuFont.render("Large", True, WHITE)
+    LargeGridRender = menuFont.render("Small", True, WHITE)
     LargeGridRenderSub = menuFont2.render("16 x 12", True, WHITE)
     gameWindow.blit(LargeGridRender, (165, 150))
     gameWindow.blit(LargeGridRenderSub, (185, 205))
@@ -141,15 +144,15 @@ def drawMenu(mousePos, clicked):
     gameWindow.blit(LargeGridRender, (500, 150))
     gameWindow.blit(LargeGridRenderSub, (535, 205))
 
-    normalGridRender = menuFont.render("Small", True, WHITE)
+    normalGridRender = menuFont.render("Large", True, WHITE)
     normalGridRenderSub = menuFont2.render("64 x 48", True, WHITE)
     gameWindow.blit(normalGridRender, (165, 400))
     gameWindow.blit(normalGridRenderSub, (185, 455))
 
-    LargeGridRender = menuFont.render("Very Small", True, WHITE)
+    LargeGridRender = menuFont.render("Very Large", True, WHITE)
     LargeGridRenderSub = menuFont2.render("80 x 60", True, WHITE)
     gameWindow.blit(LargeGridRender, (460, 400))
-    gameWindow.blit(LargeGridRenderSub, (515, 455))
+    gameWindow.blit(LargeGridRenderSub, (530, 455))
 
     # Large button
     if largeButton.collidepoint(mousePos):
@@ -290,10 +293,23 @@ endScreen = False
 while menu:
     mousePos = pygame.mouse.get_pos()
     mousePressed = pygame.mouse.get_pressed()[0]
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_ESCAPE]:
+        inPlay = False
+        restart = False
+        permaExit = True
+        menu = False
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            inPlay = False
+            restart = False
+            permaExit = True
+            menu = False
     drawMenu(mousePos, mousePressed)
 
 BLOCK_X = WIDTH//BLOCK_SIZE
 BLOCK_Y = HEIGHT//BLOCK_SIZE
+pygame.mixer.music.play(-1)
 while restart:
     # reset time
     timeElapsed = 0
@@ -316,13 +332,13 @@ while restart:
                 restart = False
                 permaExit = True
         
-        if keys[pygame.K_LEFT] and DIRECTION != 3:
+        if keys[pygame.K_a] and DIRECTION != 3:
             MOVE_Q.append(LEFT)
-        elif keys[pygame.K_RIGHT] and DIRECTION != 2:
+        elif keys[pygame.K_d] and DIRECTION != 2:
             MOVE_Q.append(RIGHT)
-        elif keys[pygame.K_UP] and DIRECTION != 1:
+        elif keys[pygame.K_w] and DIRECTION != 1:
             MOVE_Q.append(UP)
-        elif keys[pygame.K_DOWN]  and DIRECTION != 0:
+        elif keys[pygame.K_s]  and DIRECTION != 0:
             MOVE_Q.append(DOWN)
                 
         if len(MOVE_Q) >= 1:
