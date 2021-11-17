@@ -125,7 +125,7 @@ def redrawGameWindow():
         appleGenerated = True
     
     scoreRender = scoreFont.render(f"{score}/{applesNeeded}", True, WHITE)
-    gameWindow.blit(scoreRender, (WIDTH - 50, 10))
+    gameWindow.blit(scoreRender, (WIDTH - 70, 10))
 
     displayTime(timeLeft, 10, 10, TIME_COLOUR)
     time = fpsClock.tick(FPS)
@@ -460,7 +460,7 @@ while restart:
 
     # Level
     if level == 1:
-        timeLeft = 30
+        timeLeft = 180
         applesNeeded = 8
     elif level == 2:
         timeLeft = 180
