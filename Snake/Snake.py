@@ -16,7 +16,7 @@ gameWindow = pygame.display.set_mode((WIDTH, HEIGHT))
 WHITE = (255,255,255)
 BLACK = (  0,  0,  0)
 BLUE = (0, 0, 255)
-RED = (247, 27, 27)
+RED = (255, 66, 66)
 GREY = (30, 30, 30)
 LGREY = (140, 140, 140)
 ORANGE = (240, 147, 55)
@@ -29,7 +29,7 @@ SCOLOUR = WHITE
 
 # Blcok size and roundedness
 BLOCK_SIZE = 25
-ROUNDEDNESS = 0 #int((BLOCK_SIZE * 3)//25)
+ROUNDEDNESS = int((BLOCK_SIZE * 3)//25)
 ROUNDEDNESS_OBS = 3
 
 BLOCK_X = WIDTH//BLOCK_SIZE
