@@ -40,7 +40,7 @@ BLOCK_G = 0
 BLOCK_B = 255
 
 # Score
-score = 0
+score = 6
 totalScore = 0
 
 # Levels
@@ -302,9 +302,10 @@ def checkApple() -> bool:
 
 def displayTime(time: float, x: int, y: int, COLOUR):
     timeToDisplay = ""
-    strTime = round(time, 2)
+    strTime = round(time)
+    leadingZero = 0 if strTime % 60 < 10 else ""
     if strTime >= 60:
-        timeToDisplay = f"{int(strTime // 60)}:{round(strTime % 60, 1)}"
+        timeToDisplay = f"{int(strTime // 60)}:{leadingZero}{round(strTime % 60, 1)}"
     else:
         timeToDisplay = f"{round(strTime % 60, 1)}"
         
@@ -319,7 +320,6 @@ def checkScore():
         newDelay = delay - speedMultiplier * 4
         if newDelay <= 10:
             newDelay = 10
-        print(newDelay)
         delay = newDelay
 
 
