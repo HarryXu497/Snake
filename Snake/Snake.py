@@ -301,8 +301,15 @@ def checkApple() -> bool:
     return False
 
 def displayTime(time: float, x: int, y: int, COLOUR):
-    str_time = round(time, 1)
-    stopwatch = scoreFont.render(f"{str_time}", True, COLOUR)
+    timeToDisplay = ""
+    strTime = round(time, 2)
+    if strTime >= 60:
+        timeToDisplay = f"{int(strTime // 60)}:{round(strTime % 60, 1)}"
+    else:
+        timeToDisplay = f"{round(strTime % 60, 1)}"
+        
+        
+    stopwatch = scoreFont.render(f"{timeToDisplay}", True, COLOUR)
     gameWindow.blit(stopwatch, (x, y))
 
 def checkScore():
