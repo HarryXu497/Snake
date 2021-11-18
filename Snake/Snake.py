@@ -6,6 +6,7 @@
 # Date: 11/17/2021
 #########################################
 from random import randint, uniform
+import datetime
 import pygame
 pygame.init()
 WIDTH = 800
@@ -17,6 +18,7 @@ WHITE = (255,255,255)
 BLACK = (  0,  0,  0)
 BLUE = (0, 0, 255)
 RED = (255, 66, 66)
+DRED = (222, 33, 33)
 GREY = (25, 25, 25)
 LGREY = (140, 140, 140)
 ORANGE = (240, 147, 55)
@@ -27,7 +29,7 @@ LCOLOUR = WHITE
 NCOLOUR = WHITE
 SCOLOUR = WHITE
 
-# Blcok size and roundedness
+# Block size and roundedness
 BLOCK_SIZE = 25
 ROUNDEDNESS = int((BLOCK_SIZE * 3)//25)
 ROUNDEDNESS_OBS = 3
@@ -142,6 +144,7 @@ def redrawGameWindow():
         apple_x = appleX[i]
         apple_y = appleY[i]
         pygame.draw.circle(gameWindow, RED, (apple_x * BLOCK_SIZE + BLOCK_SIZE/2, apple_y * BLOCK_SIZE + BLOCK_SIZE/2), BLOCK_SIZE/2)
+        pygame.draw.circle(gameWindow, DRED, (apple_x * BLOCK_SIZE + BLOCK_SIZE/2, apple_y * BLOCK_SIZE + BLOCK_SIZE/2), BLOCK_SIZE/2, 2)
     
     if not appleGenerated:
         generateApple()
@@ -151,11 +154,12 @@ def redrawGameWindow():
     # Setting for endless/adventure
     if level > 0:
         scoreRender = scoreFont.render(f"{score}/{applesNeeded}", True, WHITE)
+        gameWindow.blit(scoreRender, (WIDTH - 70, 10))
     elif level == -1:
         leadZero = "0" if score < 10 else ""
         scoreRender = scoreFont.render(f"{leadZero}{score}", True, WHITE)
-
-    gameWindow.blit(scoreRender, (WIDTH - 50, 10))
+        gameWindow.blit(scoreRender, (WIDTH - 50, 10))
+        
     # Setting for endless/adventure
     if level > 0:
         displayTime(timeLeft, 10, 10, TIME_COLOUR)
@@ -429,8 +433,8 @@ def checkScore():
     if score % 3 == 0:
         speedMultiplier = score // 3
         newDelay = delay - speedMultiplier * 2
-        if newDelay <= 10:
-            newDelay = 10
+        if newDelay <= 30:
+            newDelay = 30
         delay = newDelay
 
 
@@ -747,9 +751,9 @@ while restart:
             inPlay = False
             gameLogString = ""
             if level > 0:
-                gameLogString = f"ADVENTURE | Level {level} : {score}/{applesNeeded} Apples"
+                gameLogString = f"ADVENTURE @ {datetime.datetime.now().strftime('%d/%m/%Y - %H:%M:%S')} [ Level {level} | {score}/{applesNeeded} Apples ]"
             else:
-                gameLogString = f"ENDLESS | Time : {round(stopwatch, 2)} | Score: {score}"
+                gameLogString = f"ENDLESS @ {datetime.datetime.now().strftime('%d/%m/%Y - %H:%M:%S')} [ Time : {round(stopwatch, 2)} | Score: {score} ]"
             games.append(gameLogString)
 
         if timeLeft < 0:
