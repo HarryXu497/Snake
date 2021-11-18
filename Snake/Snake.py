@@ -1,9 +1,9 @@
 #########################################
-# File Name: SnakeTemplate.py
-# Description: This program is a template for Snake Game.
-#              It demonstrates how to move and lengthen the snake.
-# Author: ICS2O
-# Date: 02/11/2020
+# File Name: Snake.py
+# Description: This program is a fully functional Snake Game.
+#
+# Author: Harry Xu
+# Date: 11/17/2021
 #########################################
 from random import randint, uniform
 import pygame
@@ -12,10 +12,6 @@ WIDTH = 800
 HEIGHT = 600
 gameWindow = pygame.display.set_mode((WIDTH, HEIGHT))
 
-TOP = 0
-BOTTOM = HEIGHT
-MIDDLE = WIDTH//2
-
 # Colours
 WHITE = (255,255,255)
 BLACK = (  0,  0,  0)
@@ -23,14 +19,18 @@ BLUE = (0, 0, 255)
 RED = (247, 27, 27)
 GREY = (30, 30, 30)
 LGREY = (140, 140, 140)
+ORANGE = (240, 147, 55)
 
+# Menu Colours
 VLCOLOUR = WHITE
 LCOLOUR = WHITE
 NCOLOUR = WHITE
 SCOLOUR = WHITE
 
+# Blcok size and roundedness
 BLOCK_SIZE = 25
-ROUNDEDNESS = int((BLOCK_SIZE * 3)//25)
+ROUNDEDNESS = 0 #int((BLOCK_SIZE * 3)//25)
+ROUNDEDNESS_OBS = 3
 
 BLOCK_X = WIDTH//BLOCK_SIZE
 BLOCK_Y = HEIGHT//BLOCK_SIZE
@@ -40,7 +40,7 @@ BLOCK_G = 0
 BLOCK_B = 255
 
 # Score
-score = 6
+score = 0
 totalScore = 0
 
 # Levels
@@ -58,17 +58,22 @@ menuFont2 = pygame.font.Font("fonts/MENUFONT.ttf", 20)
 icon = pygame.image.load("images/icon.png")
 pygame.display.set_icon(icon)
 
-# Sounds
+## Sounds ##
+
+# Theme
 pygame.mixer.init()
 pygame.mixer.music.load("sounds/THEME.mp3")
 pygame.mixer.music.set_volume(0.8)
 
+# Apple Eat
 appleEat = pygame.mixer.Sound("sounds/APPLEEAT.wav")
 appleEat.set_volume(0.75)
 
+# Lose the game
 lose = pygame.mixer.Sound("sounds/LOSE.wav")
 lose.set_volume(0.75)
 
+# When button is clicked
 menuNav = pygame.mixer.Sound("sounds/MENUNAV.wav")
 menuNav.set_volume(0.75)
 
@@ -76,6 +81,8 @@ menuNav.set_volume(0.75)
 FPS = 60
 fpsClock = pygame.time.Clock()
 timeLeft = 180
+
+# Time since the last apple was eaten
 lastApple = 0
 delay = 65
 
@@ -102,7 +109,7 @@ def redrawGameWindow():
     for i in range(len(obstaclesX)):
         obsCoordX = obstaclesX[i]
         obsCoordY = obstaclesY[i]
-        pygame.draw.rect(gameWindow, WHITE, (obsCoordX * BLOCK_SIZE, obsCoordY * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 0, ROUNDEDNESS)
+        pygame.draw.rect(gameWindow, ORANGE, (obsCoordX * BLOCK_SIZE, obsCoordY * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 0, ROUNDEDNESS_OBS)
 
     for i in range(len(blocksX)):
         
@@ -284,7 +291,7 @@ def generateAppleCheck(apple_x, apple_y):
 
 
 def checkApple() -> bool:
-    global appleX, appleY, appleGenerated
+    global appleX, appleY, appleGenerated, lastApple
     coord_x = blocksX[0]
     coord_y = blocksY[0]
     if coord_x in appleX and coord_y in appleY:
@@ -295,6 +302,7 @@ def checkApple() -> bool:
 
         if len(appleX) == 0:
             appleGenerated = False
+            lastApple = 0
         appleEat.play()
         return True
     
@@ -328,6 +336,14 @@ def checkWin():
     if len(blocksX) >= BLOCK_X * BLOCK_Y:
         inPlay = False
 
+def generateCheckLevel(obs_x, obs_y):
+    # Prevents obstacles from being spawned directly in front of the snake head
+    for i in range(4):
+        if obs_x == BLOCK_X//2 and obs_y == BLOCK_Y//2 + 1:
+            return False
+        
+    return True
+
 
 def checkLevel(goal, timer):
     global score, level, inPlay, nextLevel, delay
@@ -341,6 +357,9 @@ def checkLevel(goal, timer):
             for i in range(int(BLOCK_X * BLOCK_Y//184)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
+                while not generateCheckLevel(obstacle_x, obstacle_y):
+                    obstacle_x = randint(4, BLOCK_X - 4)
+                    obstacle_y = randint(4, BLOCK_Y - 4)
                 obstaclesX.append(obstacle_x)
                 obstaclesY.append(obstacle_y)
             delay = 60
@@ -348,9 +367,12 @@ def checkLevel(goal, timer):
         elif level == 3:
             obstaclesX.clear()
             obstaclesY.clear()
-            for i in range(int(BLOCK_X * BLOCK_Y//164)):
+            for i in range(int(BLOCK_X * BLOCK_Y//144)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
+                while not generateCheckLevel(obstacle_x, obstacle_y):
+                    obstacle_x = randint(4, BLOCK_X - 4)
+                    obstacle_y = randint(4, BLOCK_Y - 4)
                 obstaclesX.append(obstacle_x)
                 obstaclesY.append(obstacle_y)
             delay = 55
@@ -358,32 +380,41 @@ def checkLevel(goal, timer):
         elif level == 4:
             obstaclesX.clear()
             obstaclesY.clear()
-            for i in range(int(BLOCK_X * BLOCK_Y//132)):
+            for i in range(int(BLOCK_X * BLOCK_Y//112)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
+                while not generateCheckLevel(obstacle_x, obstacle_y):
+                    obstacle_x = randint(4, BLOCK_X - 4)
+                    obstacle_y = randint(4, BLOCK_Y - 4)
                 obstaclesX.append(obstacle_x)
                 obstaclesY.append(obstacle_y)
-            delay = 50
+            delay = 52
 
         elif level == 5:
-            obstaclesX.clear()
-            obstaclesY.clear()
-            for i in range(int(BLOCK_X * BLOCK_Y//120)):
-                obstacle_x = randint(4, BLOCK_X - 4)
-                obstacle_y = randint(4, BLOCK_Y - 4)
-                obstaclesX.append(obstacle_x)
-                obstaclesY.append(obstacle_y)
-            delay = 40
-
-        elif level >= 6:
             obstaclesX.clear()
             obstaclesY.clear()
             for i in range(int(BLOCK_X * BLOCK_Y//96)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
+                while not generateCheckLevel(obstacle_x, obstacle_y):
+                    obstacle_x = randint(4, BLOCK_X - 4)
+                    obstacle_y = randint(4, BLOCK_Y - 4)
                 obstaclesX.append(obstacle_x)
                 obstaclesY.append(obstacle_y)
-            delay = 30
+            delay = 50
+
+        elif level >= 6:
+            obstaclesX.clear()
+            obstaclesY.clear()
+            for i in range(int(BLOCK_X * BLOCK_Y//64)):
+                obstacle_x = randint(4, BLOCK_X - 4)
+                obstacle_y = randint(4, BLOCK_Y - 4)
+                while not generateCheckLevel(obstacle_x, obstacle_y):
+                    obstacle_x = randint(4, BLOCK_X - 4)
+                    obstacle_y = randint(4, BLOCK_Y - 4)
+                obstaclesX.append(obstacle_x)
+                obstaclesY.append(obstacle_y)
+            delay = 48
 
 
 def displayLevel(levelToDisplay: int):
@@ -406,9 +437,11 @@ appleY = []
 stepX = 0
 stepY = -1                          
 
+# each of the blocks X and Y coordinates
 blocksX = []
 blocksY = []
 
+# each of the obstacles X and Y coordinates
 obstaclesX = []
 obstaclesY = []
 
@@ -460,6 +493,7 @@ if not permaExit:
 
 BLOCK_X = WIDTH//BLOCK_SIZE
 BLOCK_Y = HEIGHT//BLOCK_SIZE
+displayLevel(level)
 while restart:
     # reset time
     fpsClock = pygame.time.Clock()
@@ -484,7 +518,6 @@ while restart:
     elif level >= 6:
         timeLeft = 140
         applesNeeded = 8
-        
     while inPlay:
         # Checks
         pygame.event.clear()
@@ -627,6 +660,7 @@ while restart:
         mousePressed = pygame.mouse.get_pressed()[0]
 
         if restartButton.collidepoint(mousePos) and mousePressed:
+            displayLevel(level)
             inPlay = True
             lose.stop()
         if exitButton.collidepoint(mousePos) and mousePressed:
