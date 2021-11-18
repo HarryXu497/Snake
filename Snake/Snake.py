@@ -17,7 +17,7 @@ WHITE = (255,255,255)
 BLACK = (  0,  0,  0)
 BLUE = (0, 0, 255)
 RED = (255, 66, 66)
-GREY = (30, 30, 30)
+GREY = (25, 25, 25)
 LGREY = (140, 140, 140)
 ORANGE = (240, 147, 55)
 
@@ -58,6 +58,12 @@ menuFont2 = pygame.font.Font("fonts/MENUFONT.ttf", 20)
 icon = pygame.image.load("images/icon.png")
 pygame.display.set_icon(icon)
 
+trophy = pygame.image.load("images/trophy.png")
+trophy = pygame.transform.scale(trophy, (200, 200))
+
+clock = pygame.image.load("images/clock.png")
+clock = pygame.transform.scale(clock, (200, 200))
+
 ## Sounds ##
 
 # Theme
@@ -81,16 +87,19 @@ menuNav.set_volume(0.75)
 FPS = 60
 fpsClock = pygame.time.Clock()
 timeLeft = 180
+stopwatch = 0
 
 # Time since the last apple was eaten
 lastApple = 0
 delay = 65
 
+# Game log
+games = []
 #---------------------------------------#
 # functions                             #
 #---------------------------------------#
 def redrawGameWindow():
-    global appleGenerated, lastApple, timeLeft, applesNeeded
+    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch
     TIME_COLOUR = WHITE
     BLOCK_R = 72
     BLOCK_G = 0
@@ -101,7 +110,14 @@ def redrawGameWindow():
         TIME_COLOUR = RED
     
     for i in range(round(BLOCK_X)):
-        pygame.draw.rect(gameWindow, GREY, (i * BLOCK_SIZE, 0, 1, HEIGHT))
+        for j in range(round(BLOCK_Y)):
+            if i % 2 == 0 and j % 2 == 0:
+                pygame.draw.rect(gameWindow, GREY, (i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+                
+    for i in range(round(BLOCK_X)):
+        for j in range(round(BLOCK_Y)):
+            if i % 2 == 1 and j % 2 == 1:
+                pygame.draw.rect(gameWindow, GREY, (i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
     for i in range(round(BLOCK_Y)):
         pygame.draw.rect(gameWindow, GREY, (0, i * BLOCK_SIZE, WIDTH, 1))    
@@ -130,13 +146,24 @@ def redrawGameWindow():
     if not appleGenerated:
         generateApple()
         appleGenerated = True
-    
-    scoreRender = scoreFont.render(f"{score}/{applesNeeded}", True, WHITE)
-    gameWindow.blit(scoreRender, (WIDTH - 70, 10))
 
-    displayTime(timeLeft, 10, 10, TIME_COLOUR)
+    scoreRender = ""
+    # Setting for endless/adventure
+    if level > 0:
+        scoreRender = scoreFont.render(f"{score}/{applesNeeded}", True, WHITE)
+    elif level == -1:
+        leadZero = "0" if score < 10 else ""
+        scoreRender = scoreFont.render(f"{leadZero}{score}", True, WHITE)
+
+    gameWindow.blit(scoreRender, (WIDTH - 50, 10))
+    # Setting for endless/adventure
+    if level > 0:
+        displayTime(timeLeft, 10, 10, TIME_COLOUR)
+    elif level == -1:
+        displayTime(stopwatch, 10, 10, TIME_COLOUR)
     time = fpsClock.tick(FPS)
     timeLeft -= time / 1000
+    stopwatch += time / 1000
     lastApple += time / 1000
     if timeLeft <= 0:
         inPlay = False
@@ -154,7 +181,7 @@ def redrawGameWindow():
 def drawMenu(mousePos, clicked):
     pygame.event.clear()
     gameWindow.fill(BLACK)
-    global LCOLOUR, NCOLOUR, SCOLOUR, VLCOLOUR, menu, BLOCK_SIZE
+    global LCOLOUR, NCOLOUR, SCOLOUR, VLCOLOUR, menu, BLOCK_SIZE, inPlay
 
     titleRender = menuFontLarge.render("Grid Size", True, WHITE)
     gameWindow.blit(titleRender, (260, 20))
@@ -196,6 +223,10 @@ def drawMenu(mousePos, clicked):
         menuNav.play()
         BLOCK_SIZE = 40
         menu = False
+        inPlay = False
+
+        gameWindow.fill(BLACK)
+        pygame.display.update()
     
     # Normal button
     if normalButton.collidepoint(mousePos):
@@ -208,6 +239,10 @@ def drawMenu(mousePos, clicked):
         menuNav.play()
         BLOCK_SIZE = 25
         menu = False
+        inPlay = False
+
+        gameWindow.fill(BLACK)
+        pygame.display.update()        
     
     # Large button
     if largeButton.collidepoint(mousePos):
@@ -220,6 +255,10 @@ def drawMenu(mousePos, clicked):
         menuNav.play()
         BLOCK_SIZE = 12.5
         menu = False
+        inPlay = False
+
+        gameWindow.fill(BLACK)
+        pygame.display.update()
         
     # Very Large button
     if veryLargeButton.collidepoint(mousePos):
@@ -232,6 +271,70 @@ def drawMenu(mousePos, clicked):
         menuNav.play()
         BLOCK_SIZE = 12.5
         menu = False
+        inPlay = False
+
+        gameWindow.fill(BLACK)
+        pygame.display.update()
+        
+    pygame.display.update()
+
+def drawTypeMenu(mousePos, clicked):
+    pygame.event.clear()
+    gameWindow.fill(BLACK)
+    global LCOLOUR, NCOLOUR, SCOLOUR, VLCOLOUR, menu, BLOCK_SIZE, inPlay, endless
+
+    titleRender = menuFontLarge.render("Game Mode", True, WHITE)
+    gameWindow.blit(titleRender, (230, 20))
+    
+    smallButton = pygame.draw.rect(gameWindow, LCOLOUR, (100, 120, 250, 450), 4)
+    veryLargeButton = pygame.draw.rect(gameWindow, VLCOLOUR, (450, 120, 250, 450), 4)
+
+    gameWindow.blit(trophy, (125, 340))
+    gameWindow.blit(clock, (475, 340))
+    
+    # Buttons
+    SmallGridRender = menuFont.render("Adventure", True, WHITE)
+    SmallGridRenderSub = menuFont2.render(f"", True, WHITE)
+    gameWindow.blit(SmallGridRender, (115, 200))
+    gameWindow.blit(SmallGridRenderSub, (185, 255))
+
+    LargeGridRender = menuFont.render("Endless", True, WHITE)
+    LargeGridRenderSub = menuFont2.render(f"", True, WHITE)
+    gameWindow.blit(LargeGridRender, (500, 200))
+    gameWindow.blit(LargeGridRenderSub, (530, 255))
+
+    # Small button
+    if smallButton.collidepoint(mousePos):
+        LCOLOUR = LGREY
+
+    if not smallButton.collidepoint(mousePos):
+        LCOLOUR = WHITE
+
+    if smallButton.collidepoint(mousePos) and clicked:
+        menuNav.play()
+        
+        menu = False
+        inPlay = False
+
+        gameWindow.fill(BLACK)
+        pygame.display.update()
+   
+    # Very Large button
+    if veryLargeButton.collidepoint(mousePos):
+        VLCOLOUR = LGREY
+
+    if not veryLargeButton.collidepoint(mousePos):
+        VLCOLOUR = WHITE
+
+    if veryLargeButton.collidepoint(mousePos) and clicked:
+        menuNav.play()
+        BLOCK_SIZE = 12.5
+        menu = False
+        inPlay = False
+        endless = True
+
+        gameWindow.fill(BLACK)
+        pygame.display.update()
         
     pygame.display.update()
 
@@ -325,7 +428,7 @@ def checkScore():
     global score, delay
     if score % 3 == 0:
         speedMultiplier = score // 3
-        newDelay = delay - speedMultiplier * 4
+        newDelay = delay - speedMultiplier * 2
         if newDelay <= 10:
             newDelay = 10
         delay = newDelay
@@ -348,7 +451,7 @@ def generateCheckLevel(obs_x, obs_y):
 def checkLevel(goal, timer):
     global score, level, inPlay, nextLevel, delay
     if score >= goal and timer > 0:
-        level += 1
+        level += 1 
         inPlay = False
         nextLevel = True
         if level == 2:
@@ -417,10 +520,15 @@ def checkLevel(goal, timer):
             delay = 48
 
 
-def displayLevel(levelToDisplay: int):
+def displayLevel(levelToDisplay: int, endlessMode = False):
     gameWindow.fill(BLACK)
     levelText = menuFont.render(f"Level {levelToDisplay}", True, WHITE)
-    gameWindow.blit(levelText, (330, 260))
+    if endlessMode:
+        levelText = menuFont.render(f"Endless Mode", True, WHITE)
+    if not endlessMode:
+        gameWindow.blit(levelText, (330, 260))
+    else:
+        gameWindow.blit(levelText, (260, 260))
     pygame.display.update()
     pygame.time.delay(1000)
     
@@ -469,31 +577,77 @@ restart = True
 permaExit = False
 endScreen = False
 nextLevel = False
+endless = False
 
 pygame.mixer.music.play(-1)
-while menu:
-    mousePos = pygame.mouse.get_pos()
-    mousePressed = pygame.mouse.get_pressed()[0]
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_ESCAPE]:
-        inPlay = False
-        restart = False
-        permaExit = True
-        menu = False
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+while inPlay:
+
+    pygame.event.clear()
+
+    if menu:
+        mousePos = pygame.mouse.get_pos()
+        mousePressed = pygame.mouse.get_pressed()[0]
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
             inPlay = False
             restart = False
             permaExit = True
             menu = False
-    drawMenu(mousePos, mousePressed)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                inPlay = False
+                restart = False
+                permaExit = True
+                menu = False
+        drawTypeMenu(mousePos, mousePressed)
 
 if not permaExit:
-    menu = True
+    inPlay = True
+
+menu = True
+
+pygame.time.delay(400)
+
+while inPlay:
+
+    pygame.event.clear()
+    
+    if menu:
+        mousePos = pygame.mouse.get_pos()
+        mousePressed = pygame.mouse.get_pressed()[0]
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_ESCAPE]:
+            inPlay = False
+            restart = False
+            permaExit = True
+            menu = False
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                inPlay = False
+                restart = False
+                permaExit = True
+                menu = False
+        drawMenu(mousePos, mousePressed)
+
+if not permaExit:
+    inPlay = True
+
+menu = True
+
+if endless:
+    level =-1
+
+pygame.time.delay(400)
 
 BLOCK_X = WIDTH//BLOCK_SIZE
 BLOCK_Y = HEIGHT//BLOCK_SIZE
-displayLevel(level)
+
+# Displaying level if adventure mode, diplays "Endless Mode" is endless mode is on
+if not endless:
+    displayLevel(level)
+elif endless:
+    displayLevel(0, endlessMode=True)
+    
 while restart:
     # reset time
     fpsClock = pygame.time.Clock()
@@ -507,23 +661,24 @@ while restart:
         timeLeft = 180
         applesNeeded = 10
     elif level == 3:
-        timeLeft = 160
+        timeLeft = 170
         applesNeeded = 10
     elif level == 4:
         timeLeft = 160
-        applesNeeded = 12
+        applesNeeded = 10
     elif level == 5:
         timeLeft = 150
-        applesNeeded = 8
+        applesNeeded = 10
     elif level >= 6:
         timeLeft = 140
-        applesNeeded = 8
+        applesNeeded = 12
     while inPlay:
         # Checks
         pygame.event.clear()
         redrawGameWindow()
         checkWin()
-        checkLevel(applesNeeded, timeLeft)
+        if not endless:
+            checkLevel(applesNeeded, timeLeft)
 
         pygame.time.delay(delay)
 
@@ -590,6 +745,12 @@ while restart:
         
         if checkCollision():
             inPlay = False
+            gameLogString = ""
+            if level > 0:
+                gameLogString = f"ADVENTURE | Level {level} : {score}/{applesNeeded} Apples"
+            else:
+                gameLogString = f"ENDLESS | Time : {round(stopwatch, 2)} | Score: {score}"
+            games.append(gameLogString)
 
         if timeLeft < 0:
             inPlay = False
@@ -638,7 +799,7 @@ while restart:
         appleGenerated = False
     
         lastApple = 0
-        
+    
     if endScreen:
         level = 1
         obstaclesX.clear()
@@ -660,12 +821,20 @@ while restart:
         mousePressed = pygame.mouse.get_pressed()[0]
 
         if restartButton.collidepoint(mousePos) and mousePressed:
-            displayLevel(level)
+            if endless:
+                level =-1
+            # Displaying level if adventure mode, diplays "Endless Mode" is endless mode is on
+            if not endless:
+                displayLevel(level)
+            elif endless:
+                displayLevel(0, endlessMode=True)
+                
             inPlay = True
             lose.stop()
         if exitButton.collidepoint(mousePos) and mousePressed:
             endScreen = False
             restart = False
+
             
         keys = pygame.key.get_pressed()
         if keys[pygame.K_ESCAPE]:
@@ -679,5 +848,14 @@ while restart:
                 permaExit = True
         
 
-#---------------------------------------#    
+#---------------------------------------#
+
+
+with open("logs.txt", 'a', 1) as log:
+    for game in games:
+        log.write(game + "\n")
+
+with open("logs.txt", 'r', 1) as log:
+    print(log.read())
+    
 pygame.quit()
