@@ -5,7 +5,7 @@
 # Author: Harry Xu
 # Date: 11/17/2021
 #########################################
-from random import randint, uniform
+from random import randint
 import datetime
 import pygame
 
@@ -24,6 +24,7 @@ DRED = (222, 33, 33)
 GREY = (25, 25, 25)
 LGREY = (140, 140, 140)
 ORANGE = (240, 147, 55)
+# PURPLE = (72, 0, 255)
 
 # Menu Colours
 VLCOLOUR = WHITE
@@ -46,7 +47,6 @@ BLOCK_Y = HEIGHT // BLOCK_SIZE
 score = 0
 totalScore = 0
 
-
 # Levels ######################################################
 level = 1
 applesNeeded = 8
@@ -56,10 +56,8 @@ ENDLESS = -1
 # Setting game window
 gameWindow = pygame.display.set_mode((WIDTH, HEIGHT))
 
-
 # Images ######################################################
 icon = pygame.image.load("images/icon.png")
-pygame.display.set_icon(icon)  # setting icon
 
 trophy = pygame.image.load("images/trophy.png")
 trophy = pygame.transform.scale(trophy, (200, 200))
@@ -67,13 +65,17 @@ trophy = pygame.transform.scale(trophy, (200, 200))
 clock = pygame.image.load("images/clock.png")
 clock = pygame.transform.scale(clock, (200, 200))
 
+# Icon, Caption and Cursor ####################################
+pygame.display.set_icon(icon)  # setting icon
+pygame.display.set_caption("Snake")
+pygame.mouse.set_cursor(pygame.cursors.diamond)
+
 # Fonts #######################################################
 scoreFont = pygame.font.SysFont("Bahnschrift", 30)
 menuFontLarger = pygame.font.Font("fonts/MENUFONT.ttf", 120)
 menuFontLarge = pygame.font.Font("fonts/MENUFONT.ttf", 60)
 menuFont = pygame.font.Font("fonts/MENUFONT.ttf", 40)
 menuFont2 = pygame.font.Font("fonts/MENUFONT.ttf", 20)
-
 
 # Sounds ######################################################################
 
@@ -165,6 +167,8 @@ MOVE_Q = []
 
 # Game logs
 games = []
+
+
 ###############################################################################
 #
 # Functions
@@ -192,66 +196,63 @@ def redrawGameWindow() -> None:
         TIME_COLOUR = RED
 
     # Draws the grid ##########################################################
-    for i in range(round(BLOCK_X)):
-        for j in range(round(BLOCK_Y)):
-            if i % 2 == 0 and j % 2 == 0:
-                pygame.draw.rect(gameWindow, GREY, (i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+    for j in range(round(BLOCK_X)):
+        for k in range(round(BLOCK_Y)):
+            if j % 2 == 0 and k % 2 == 0:
+                pygame.draw.rect(gameWindow, GREY, (j * BLOCK_SIZE, k * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
-    for i in range(round(BLOCK_X)):
-        for j in range(round(BLOCK_Y)):
-            if i % 2 == 1 and j % 2 == 1:
-                pygame.draw.rect(gameWindow, GREY, (i * BLOCK_SIZE, j * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+    for j in range(round(BLOCK_X)):
+        for k in range(round(BLOCK_Y)):
+            if j % 2 == 1 and k % 2 == 1:
+                pygame.draw.rect(gameWindow, GREY, (j * BLOCK_SIZE, k * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
 
     # ----------------------------------------------------------------------- #
 
     # Draws the obstacles #####################################################
-    for i in range(len(obstaclesX)):
-        obsCoordX = obstaclesX[i]
-        obsCoordY = obstaclesY[i]
+    for j in range(len(obstaclesX)):
+        obsCoordX = obstaclesX[j]
+        obsCoordY = obstaclesY[j]
         pygame.draw.rect(gameWindow, ORANGE, (obsCoordX * BLOCK_SIZE, obsCoordY * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
                          0, ROUNDEDNESS_OBS)
 
     # ----------------------------------------------------------------------- #
 
     # Draws the snake segments ################################################
-    for i in range(len(blocksX)):
+    for j in range(len(blocksX)):
         SEG_COLOUR = (BLOCK_R, BLOCK_G, BLOCK_B)
-        coord_x = blocksX[i]
-        coord_y = blocksY[i]
-        pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
-                         0, ROUNDEDNESS)
+        coord_x = blocksX[j]
+        coord_y = blocksY[j]
+        # if coord_x == blocksX[0] and coord_y == blocksY[0]:
+        #    SEG_COLOUR = PURPLE
+        pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 0, ROUNDEDNESS)
 
         # Changes the color to make a gradient
         if BLOCK_R + 20 <= 255 and not flip:
             BLOCK_R += 10
-            
+
         elif BLOCK_R + 20 > 255:
             flip = True
-        
+
         if BLOCK_G + 20 <= 255 and not flip:
             BLOCK_G += 10
 
-
-        if BLOCK_R - 20 >= 0 and flip:
+        if BLOCK_R > 82 and flip:
             BLOCK_R -= 10
-        else:
+
+        elif BLOCK_R <= 82:
             flip = False
 
         if BLOCK_G - 20 >= 0 and flip:
-            BLOCK_G -= 10  
+            BLOCK_G -= 10
 
-    # ----------------------------------------------------------------------- #
+        # ----------------------------------------------------------------------- #
 
     # Draws the apples ########################################################
-    for i in range(len(appleX)):
-        apple_x = appleX[i]
-        apple_y = appleY[i]
-        pygame.draw.circle(gameWindow, RED,
-                           (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2),
-                           BLOCK_SIZE / 2)
-        pygame.draw.circle(gameWindow, DRED,
-                           (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2),
-                           BLOCK_SIZE / 2, 2)
+    for j in range(len(appleX)):
+        apple_x = appleX[j]
+        apple_y = appleY[j]
+        pygame.draw.circle(gameWindow, RED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2)
+        pygame.draw.circle(gameWindow, DRED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2, 2)
 
     # ----------------------------------------------------------------------- #
 
@@ -549,9 +550,9 @@ def checkCollision() -> bool:
     # ----------------------------------------------------------------------- #
 
     # The snake head has hit itself ###########################################
-    for i in range(len(blocksX) - 1):
-        coord_x = blocksX[i + 1]
-        coord_y = blocksY[i + 1]
+    for j in range(len(blocksX) - 1):
+        coord_x = blocksX[j + 1]
+        coord_y = blocksY[j + 1]
         if blocksX[0] == coord_x and blocksY[0] == coord_y:
             lose.play()
             return True
@@ -559,9 +560,9 @@ def checkCollision() -> bool:
     # ----------------------------------------------------------------------- #
 
     # The snake has hit an obstacle ###########################################
-    for i in range(len(obstaclesX)):
-        coord_x = obstaclesX[i]
-        coord_y = obstaclesY[i]
+    for j in range(len(obstaclesX)):
+        coord_x = obstaclesX[j]
+        coord_y = obstaclesY[j]
         if blocksX[0] == coord_x and blocksY[0] == coord_y:
             lose.play()
             return True
@@ -605,13 +606,13 @@ def generateAppleCheck(apple_x: int, apple_y: int) -> bool:
     Return => bool
     """
     # Checks if the apple is in the snake
-    for i in range(len(blocksX)):
-        if apple_x == blocksX[i] and apple_y == blocksY[i]:
+    for j in range(len(blocksX)):
+        if apple_x == blocksX[j] and apple_y == blocksY[j]:
             return False
 
     # Checks if the apple is in the obstacle
-    for i in range(len(obstaclesX)):
-        if apple_x == obstaclesX[i] and apple_y == obstaclesY[i]:
+    for j in range(len(obstaclesX)):
+        if apple_x == obstaclesX[j] and apple_y == obstaclesY[j]:
             return False
 
     # The apple's coordinates are valid
@@ -632,10 +633,10 @@ def checkApple() -> bool:
 
     # Iterating through the apple coordinate lists
     if coord_x in appleX and coord_y in appleY:
-        for i in range(len(appleX) - 1, -1, -1):  # Goes backward as to not cause an IndexError: "index out of range"
-            if appleX[i] == coord_x and appleY[i] == coord_y:
-                del appleX[i]
-                del appleY[i]
+        for j in range(len(appleX) - 1, -1, -1):  # Goes backward as to not cause an IndexError: "index out of range"
+            if appleX[j] == coord_x and appleY[j] == coord_y:
+                del appleX[j]
+                del appleY[j]
 
         # If there are no apples, generated one
         if len(appleX) == 0:
@@ -683,7 +684,7 @@ def checkScore() -> None:
     global score, delay
     if score % 3 == 0:
         speedMultiplier = score // 3
-        newDelay = delay - speedMultiplier * 2
+        newDelay = delay - speedMultiplier
         if newDelay <= 30:
             newDelay = 30
         delay = newDelay
@@ -710,11 +711,11 @@ def generateCheckLevel(obs_x: int, obs_y: int) -> bool:
     Parameters:
         obs_x -> the x coordinate of the obstacle
         obs_y -> the y coordinate of the obstacle
-    
+
     Return => bool
     """
     # Prevents obstacles from being spawned directly in front of the snake head
-    for i in range(int(BLOCK_Y//5)):
+    for j in range(int(BLOCK_Y // 5)):
         if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 + 1:
             return False
 
@@ -745,7 +746,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 184)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 184)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
 
@@ -768,7 +769,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 144)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 144)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
 
@@ -791,7 +792,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 112)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 112)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
 
@@ -814,7 +815,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 96)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 96)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
 
@@ -837,7 +838,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 64)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 64)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
 
@@ -860,7 +861,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 52)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 52)):
                 obstacle_x = randint(4, BLOCK_X - 4)
                 obstacle_y = randint(4, BLOCK_Y - 4)
 
@@ -883,7 +884,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 44)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 44)):
                 obstacle_x = randint(4, BLOCK_X - 3)
                 obstacle_y = randint(4, BLOCK_Y - 3)
 
@@ -906,7 +907,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 36)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 36)):
                 obstacle_x = randint(4, BLOCK_X - 3)
                 obstacle_y = randint(4, BLOCK_Y - 3)
 
@@ -929,7 +930,7 @@ def checkLevel(goal: int, timer: int) -> None:
             obstaclesY.clear()
 
             # Generating obstacles depending on the level
-            for i in range(int(BLOCK_X * BLOCK_Y // 32)):
+            for j in range(int(BLOCK_X * BLOCK_Y // 32)):
                 obstacle_x = randint(4, BLOCK_X - 2)
                 obstacle_y = randint(4, BLOCK_Y - 2)
 
@@ -1062,8 +1063,6 @@ def checkQuit():
         menu = False
         restart = False
 
-
-    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             inPlay = False
@@ -1111,9 +1110,8 @@ while inPlay:
     pygame.event.clear()
 
     if menu:
-
         mousePos = pygame.mouse.get_pos()
-        mousePressed = pygame.mouse.get_pressed()[0]
+        mousePressed = pygame.mouse.get_pressed(3)[0]
         keys = pygame.key.get_pressed()
 
         # Draws the menu with the mouse position and buttons as arguments
@@ -1132,7 +1130,6 @@ menu = True
 # Delay
 pygame.time.delay(400)
 
-
 # --------------------------------------------------- #
 #
 # Grid Size Menu
@@ -1142,16 +1139,17 @@ while inPlay:
 
     pygame.event.clear()
 
+    # ESC key and QUIT button
+    checkQuit()
+
     if menu:
         mousePos = pygame.mouse.get_pos()
-        mousePressed = pygame.mouse.get_pressed()[0]
+        mousePressed = pygame.mouse.get_pressed(3)[0]
         keys = pygame.key.get_pressed()
 
         # Draws the menu with the mouse position and buttons as arguments
         drawMenu(mousePos, mousePressed)
 
-        # ESC key and QUIT button
-        checkQuit()
 
 # If ESC or QUIT was pressed, we do not run the rest of the code
 if not permaExit:
@@ -1278,7 +1276,6 @@ while restart:
             change_X = blocksX[-1] - blocksX[-2]
             change_Y = blocksY[-1] - blocksY[-2]
 
-
         # Moves the head of the snake
         blocksX[0] += stepX
         blocksY[0] += stepY
@@ -1304,7 +1301,6 @@ while restart:
         # Checks for time; ends if time runs out
         if timeLeft < 0:
             inPlay = False
-
 
     # If ESC or QUIT was pressed, we do not run the rest of the code
     if not permaExit:
@@ -1380,14 +1376,14 @@ while restart:
 
         keys = pygame.key.get_pressed()
         mousePos = pygame.mouse.get_pos()
-        mousePressed = pygame.mouse.get_pressed()[0]
+        mousePressed = pygame.mouse.get_pressed(3)[0]
 
         # Resets if restart is pressed
         if restartButton.collidepoint(mousePos) and mousePressed:
             # Stops sounds
             nextLevelSound.stop()
             lose.stop()
-            
+
             # Sets level if endless mode is on
             if endless:
                 level = ENDLESS
