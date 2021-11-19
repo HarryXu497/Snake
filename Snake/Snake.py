@@ -177,7 +177,7 @@ def redrawGameWindow() -> None:
 
     Return => None
     """
-    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch, inPlay, win
+    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch, inPlay, win, flip
     TIME_COLOUR = WHITE
     BLOCK_R = 72
     BLOCK_G = 0
@@ -222,10 +222,23 @@ def redrawGameWindow() -> None:
                          0, ROUNDEDNESS)
 
         # Changes the color to make a gradient
-        if BLOCK_R + 20 <= 255:
+        if BLOCK_R + 20 <= 255 and not flip:
             BLOCK_R += 10
-        if BLOCK_G + 20 <= 255:
+            
+        elif BLOCK_R + 20 > 255:
+            flip = True
+        
+        if BLOCK_G + 20 <= 255 and not flip:
             BLOCK_G += 10
+
+
+        if BLOCK_R - 20 >= 0 and flip:
+            BLOCK_R -= 10
+        else:
+            flip = False
+
+        if BLOCK_G - 20 >= 0 and flip:
+            BLOCK_G -= 10  
 
     # ----------------------------------------------------------------------- #
 
@@ -690,9 +703,18 @@ def checkWin() -> None:
         inPlay = False
 
 
-def generateCheckLevel(obs_x, obs_y):
+def generateCheckLevel(obs_x: int, obs_y: int) -> bool:
+    """
+    Checks if the obstacle is directly in front of the snake and true if so
+
+    Parameters:
+        obs_x -> the x coordinate of the obstacle
+        obs_y -> the y coordinate of the obstacle
+    
+    Return => bool
+    """
     # Prevents obstacles from being spawned directly in front of the snake head
-    for i in range(4):
+    for i in range(int(BLOCK_Y//5)):
         if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 + 1:
             return False
 
@@ -1039,6 +1061,9 @@ def checkQuit():
         permaExit = True
         menu = False
         restart = False
+
+
+    
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             inPlay = False
@@ -1065,13 +1090,12 @@ endScreen = False
 nextLevel = False
 endless = False
 win = False
+flip = False
 
 # add coordinates for the head and 3 segments
 for i in range(4):
     blocksX.append(BLOCK_X // 2)
     blocksY.append(BLOCK_Y // 2 + i)
-
-
 
 # --------------------------------------------------- #
 #
@@ -1190,13 +1214,13 @@ while restart:
         checkQuit()
 
         # Mapping directions to keys
-        if keys[pygame.K_a] and DIRECTION != 3:
+        if keys[pygame.K_LEFT] and DIRECTION != 3:
             MOVE_Q.append(LEFT)
-        elif keys[pygame.K_d] and DIRECTION != 2:
+        elif keys[pygame.K_RIGHT] and DIRECTION != 2:
             MOVE_Q.append(RIGHT)
-        elif keys[pygame.K_w] and DIRECTION != 1:
+        elif keys[pygame.K_UP] and DIRECTION != 1:
             MOVE_Q.append(UP)
-        elif keys[pygame.K_s] and DIRECTION != 0:
+        elif keys[pygame.K_DOWN] and DIRECTION != 0:
             MOVE_Q.append(DOWN)
 
         # pops the first element in the movement queue if there is an element
@@ -1280,6 +1304,7 @@ while restart:
         # Checks for time; ends if time runs out
         if timeLeft < 0:
             inPlay = False
+
 
     # If ESC or QUIT was pressed, we do not run the rest of the code
     if not permaExit:
