@@ -86,7 +86,6 @@ menuFont2 = pygame.font.Font("fonts/MENUFONT.ttf", 20)
 
 menuFontTitle = pygame.font.Font("fonts/MENUFONTITLE.ttf", 80)
 
-
 # Sounds ######################################################################
 
 # Theme
@@ -232,9 +231,9 @@ def redrawGameWindow() -> None:
         SEG_COLOUR = (BLOCK_R, BLOCK_G, BLOCK_B)
         coord_x = blocksX[j]
         coord_y = blocksY[j]
-        # if coord_x == blocksX[0] and coord_y == blocksY[0]:
-        #    SEG_COLOUR = PURPLE
-        pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 0, ROUNDEDNESS)
+
+        pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
+                         0, ROUNDEDNESS)
 
         # Changes the color to make a gradient
         if BLOCK_R + 20 <= 255 and not flipSegmentColour:
@@ -438,7 +437,7 @@ def drawMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     if veryLargeButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
-        BLOCK_SIZE = 12.5
+        BLOCK_SIZE = 10
         menu = False
         inPlay = False
 
@@ -525,7 +524,6 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     if endlessButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
-        BLOCK_SIZE = 12.5
         menu = False
         inPlay = False
         endless = True
@@ -576,7 +574,6 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     # ----------------------------------------------------------------------- #
 
-
     # Button changes color on hover ###########################################
 
     if restartButton.collidepoint(mousePosition):
@@ -587,7 +584,6 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
         RCOLOUR = WHITE
 
     # ----------------------------------------------------------------------- #
-
 
     # Resets if restart is pressed ############################################
     if restartButton.collidepoint(mousePosition) and mouseClicked:
@@ -608,7 +604,6 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     # ----------------------------------------------------------------------- #
 
-
     # Button changes color on hover ###########################################
     if exitButton.collidepoint(mousePosition):
         # changes colour to grey on hover
@@ -618,7 +613,6 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
         ECOLOUR = WHITE
 
     # ----------------------------------------------------------------------- #
-
 
     # Resets if restart is pressed ############################################
     if exitButton.collidepoint(mousePosition) and mouseClicked:
@@ -685,11 +679,11 @@ def generateApple() -> None:
 
     Return => None
     """
-    # Initailizes the apple_x and apple_y variables
+    # Initializes the apple_x and apple_y variables
     apple_x = randint(0, BLOCK_X - 1)
     apple_y = randint(0, BLOCK_Y - 1)
 
-    # Keeps generating until apple isn't in an obstacle or a snake
+    # Keeps generating until apple isn't in an obstacle or a snake or in another apple
     while not generateAppleCheck(apple_x, apple_y):
         apple_x = randint(0, BLOCK_X - 1)
         apple_y = randint(0, BLOCK_Y - 1)
@@ -1205,11 +1199,6 @@ endless = False
 win = False
 flipSegmentColour = False
 
-# add coordinates for the head and 3 segments
-for i in range(INITIAL_SEGMENTS):
-    blocksX.append(BLOCK_X // 2)
-    blocksY.append(BLOCK_Y // 2 + i)
-
 # --------------------------------------------------- #
 #
 # Game Mode Menu
@@ -1264,7 +1253,6 @@ while inPlay:
         # Draws the menu with the mouse position and buttons as arguments
         drawMenu(mousePos, clicked)
 
-
 # If ESC or QUIT was pressed, we do not run the rest of the code
 if not permaExit:
     inPlay = True
@@ -1297,13 +1285,18 @@ while restart:
     # Checks the level and sets the parameters
     checkLevelParams()
 
+    # add coordinates for the head and 3 segments
+    for i in range(INITIAL_SEGMENTS):
+        blocksX.append(BLOCK_X // 2)
+        blocksY.append(BLOCK_Y // 2 + i)
+
     # --------------------------------------------------- #
     #
     # Game loop
     #
     # --------------------------------------------------- #
     while inPlay:
-        
+
         pygame.event.clear()
 
         # Redraws the game window
@@ -1435,11 +1428,6 @@ while restart:
     DIRECTION = UP
     appleGenerated = False
     lastApple = 0
-
-    # Resets the snake - gives it 4 segments to start
-    for i in range(INITIAL_SEGMENTS):
-        blocksX.append(BLOCK_X // 2)
-        blocksY.append(BLOCK_Y // 2 + i)
 
     # ----------------------------------------------------------------------- #
 
