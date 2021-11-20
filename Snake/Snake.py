@@ -32,6 +32,10 @@ LCOLOUR = WHITE
 NCOLOUR = WHITE
 SCOLOUR = WHITE
 
+# Exit screen colours
+RCOLOUR = WHITE
+ECOLOUR = WHITE
+
 # --------------------------------------------------------------------------- #
 
 # Block size and roundedness
@@ -42,6 +46,9 @@ ROUNDEDNESS_OBS = 3  # rounded-ness of the obstacles
 # The width and height of the coordinate plane
 BLOCK_X = WIDTH // BLOCK_SIZE
 BLOCK_Y = HEIGHT // BLOCK_SIZE
+
+# Initial segments that you start with
+INITIAL_SEGMENTS = 0
 
 # Score #######################################################
 score = 0
@@ -181,7 +188,7 @@ def redrawGameWindow() -> None:
 
     Return => None
     """
-    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch, inPlay, win, flip
+    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch, inPlay, win, flipSegmentColour
     TIME_COLOUR = WHITE
     BLOCK_R = 72
     BLOCK_G = 0
@@ -227,22 +234,22 @@ def redrawGameWindow() -> None:
         pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE), 0, ROUNDEDNESS)
 
         # Changes the color to make a gradient
-        if BLOCK_R + 20 <= 255 and not flip:
+        if BLOCK_R + 20 <= 255 and not flipSegmentColour:
             BLOCK_R += 10
 
         elif BLOCK_R + 20 > 255:
-            flip = True
+            flipSegmentColour = True
 
-        if BLOCK_G + 20 <= 255 and not flip:
+        if BLOCK_G + 20 <= 255 and not flipSegmentColour:
             BLOCK_G += 10
 
-        if BLOCK_R > 82 and flip:
+        if BLOCK_R > 82 and flipSegmentColour:
             BLOCK_R -= 10
 
         elif BLOCK_R <= 82:
-            flip = False
+            flipSegmentColour = False
 
-        if BLOCK_G - 20 >= 0 and flip:
+        if BLOCK_G - 20 >= 0 and flipSegmentColour:
             BLOCK_G -= 10
 
         # ----------------------------------------------------------------------- #
@@ -302,7 +309,7 @@ def redrawGameWindow() -> None:
     pygame.display.update()
 
 
-def drawMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
+def drawMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     """
     Draws the grid size menu. The mouse position and left click are passed as parameters
 
@@ -365,7 +372,7 @@ def drawMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
     if not smallButton.collidepoint(mousePosition):
         LCOLOUR = WHITE
 
-    if smallButton.collidepoint(mousePosition) and clicked:
+    if smallButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
         BLOCK_SIZE = 40
@@ -385,7 +392,7 @@ def drawMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
     if not normalButton.collidepoint(mousePosition):
         SCOLOUR = WHITE
 
-    if normalButton.collidepoint(mousePosition) and clicked:
+    if normalButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
         BLOCK_SIZE = 25
@@ -405,7 +412,7 @@ def drawMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
     if not largeButton.collidepoint(mousePosition):
         NCOLOUR = WHITE
 
-    if largeButton.collidepoint(mousePosition) and clicked:
+    if largeButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
         BLOCK_SIZE = 12.5
@@ -425,7 +432,7 @@ def drawMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
     if not veryLargeButton.collidepoint(mousePosition):
         VLCOLOUR = WHITE
 
-    if veryLargeButton.collidepoint(mousePosition) and clicked:
+    if veryLargeButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
         BLOCK_SIZE = 12.5
@@ -442,7 +449,7 @@ def drawMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
     pygame.display.update()
 
 
-def drawTypeMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
+def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     """
     Draws the game mode menu. The mouse position and left click are passed as parameters
 
@@ -493,7 +500,7 @@ def drawTypeMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
     if not adventureButton.collidepoint(mousePosition):
         LCOLOUR = WHITE
 
-    if adventureButton.collidepoint(mousePosition) and clicked:
+    if adventureButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
 
@@ -512,7 +519,7 @@ def drawTypeMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
     if not endlessButton.collidepoint(mousePosition):
         VLCOLOUR = WHITE
 
-    if endlessButton.collidepoint(mousePosition) and clicked:
+    if endlessButton.collidepoint(mousePosition) and mouseClicked:
         # Button is clicked; start game
         menuNav.play()
         BLOCK_SIZE = 12.5
@@ -526,6 +533,101 @@ def drawTypeMenu(mousePosition: tuple[int, int], clicked: bool) -> None:
 
     # ----------------------------------------------------------------------- #
 
+    pygame.display.update()
+
+
+def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
+    """
+    Draws the end screen menu. The mouse position and left click are passed as parameters
+
+    Parameters:
+        mousePosition -> a tuple of the mouse's x and y position.
+        clicked -> a boolean for whether left click is clicked or not
+
+    Return => None
+    """
+    global RCOLOUR, ECOLOUR, level, win, inPlay, endScreen, restart, keys
+    pygame.event.clear()
+    gameWindow.fill(BLACK)
+
+    # Draws the exit and play again buttons
+    restartButton = pygame.draw.rect(gameWindow, RCOLOUR, (270, 300, 280, 100), 4)
+    exitButton = pygame.draw.rect(gameWindow, ECOLOUR, (310, 490, 200, 60), 4)
+
+    # Endscreen Text
+    restartText = menuFont.render("Play Again?", True, WHITE)
+    exitText = menuFont.render("Exit", True, WHITE)
+    gameWindow.blit(restartText, (282, 325))
+    gameWindow.blit(exitText, (365, 495))
+
+    # Draws icons depending on game mode ######################################
+    if win:
+        if level > 0:
+            gameWindow.blit(trophy, (315, 30))
+        if level == ENDLESS:
+            gameWindow.blit(clock, (315, 30))
+
+    # You lost :(
+    else:
+        gameWindow.blit(icon, (270, 0))
+
+    # ----------------------------------------------------------------------- #
+
+
+    # Button changes color on hover ###########################################
+
+    if restartButton.collidepoint(mousePosition):
+        # changes colour to grey on hover
+        RCOLOUR = LGREY
+
+    if not restartButton.collidepoint(mousePosition):
+        RCOLOUR = WHITE
+
+    # ----------------------------------------------------------------------- #
+
+
+    # Resets if restart is pressed ############################################
+    if restartButton.collidepoint(mousePosition) and mouseClicked:
+        # Stops sounds
+        nextLevelSound.stop()
+        lose.stop()
+
+        # Sets level if endless mode is on
+        if endless:
+            level = ENDLESS
+
+        # Displaying level if adventure mode, displays "Endless Mode" is endless mode is on
+        if not endless:
+            displayLevel(level)
+        elif endless:
+            displayLevel(0, endlessMode=True)
+        inPlay = True
+
+    # ----------------------------------------------------------------------- #
+
+
+    # Button changes color on hover ###########################################
+    if exitButton.collidepoint(mousePosition):
+        # changes colour to grey on hover
+        ECOLOUR = LGREY
+
+    if not exitButton.collidepoint(mousePosition):
+        ECOLOUR = WHITE
+
+    # ----------------------------------------------------------------------- #
+
+
+    # Resets if restart is pressed ############################################
+    if exitButton.collidepoint(mousePosition) and mouseClicked:
+        endScreen = False
+        restart = False
+
+    # ----------------------------------------------------------------------- #
+
+    # Checks ESC and QUIT buttons
+    checkQuit()
+
+    # Updating Screen
     pygame.display.update()
 
 
@@ -698,15 +800,19 @@ def checkWin() -> None:
 
     Return => None
     """
-    global score, inPlay, win
+    global score, inPlay, win, level
     if len(blocksX) >= BLOCK_X * BLOCK_Y or level > 10:
+        nextLevelSound.stop()  # stops sound to prevent overlap
+        nextLevelSound.play()
         win = True
         inPlay = False
+        if level > 0:  # the icon displayed for win depends on the level: if its > 0 or ENDLESS
+            level = 1  # sets level to 1 after win in adventure mode
 
 
 def generateCheckLevel(obs_x: int, obs_y: int) -> bool:
     """
-    Checks if the obstacle is directly in front of the snake and true if so
+    Checks if the obstacle is directly in front of the snake and returns true if so
 
     Parameters:
         obs_x -> the x coordinate of the obstacle
@@ -717,6 +823,11 @@ def generateCheckLevel(obs_x: int, obs_y: int) -> bool:
     # Prevents obstacles from being spawned directly in front of the snake head
     for j in range(int(BLOCK_Y // 5)):
         if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 + 1:
+            return False
+
+    # Prevents obstacles from being spawned in the snake
+    for j in range(int(INITIAL_SEGMENTS)):
+        if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 - 1:
             return False
 
     return True
@@ -1019,7 +1130,7 @@ def checkLevelParams() -> None:
         timeLeft = 0
         applesNeeded = 0
         win = True
-        nextLevelSound.play()
+        nextLevelSound.stop()
 
 
 def displayLevel(levelToDisplay: int, endlessMode: bool = False) -> None:
@@ -1089,10 +1200,10 @@ endScreen = False
 nextLevel = False
 endless = False
 win = False
-flip = False
+flipSegmentColour = False
 
 # add coordinates for the head and 3 segments
-for i in range(4):
+for i in range(INITIAL_SEGMENTS):
     blocksX.append(BLOCK_X // 2)
     blocksY.append(BLOCK_Y // 2 + i)
 
@@ -1111,11 +1222,11 @@ while inPlay:
 
     if menu:
         mousePos = pygame.mouse.get_pos()
-        mousePressed = pygame.mouse.get_pressed(3)[0]
+        clicked = pygame.mouse.get_pressed(3)[0]
         keys = pygame.key.get_pressed()
 
         # Draws the menu with the mouse position and buttons as arguments
-        drawTypeMenu(mousePos, mousePressed)
+        drawTypeMenu(mousePos, clicked)
 
         # ESC key and QUIT button
         checkQuit()
@@ -1144,11 +1255,11 @@ while inPlay:
 
     if menu:
         mousePos = pygame.mouse.get_pos()
-        mousePressed = pygame.mouse.get_pressed(3)[0]
+        clicked = pygame.mouse.get_pressed(3)[0]
         keys = pygame.key.get_pressed()
 
         # Draws the menu with the mouse position and buttons as arguments
-        drawMenu(mousePos, mousePressed)
+        drawMenu(mousePos, clicked)
 
 
 # If ESC or QUIT was pressed, we do not run the rest of the code
@@ -1189,7 +1300,7 @@ while restart:
     #
     # --------------------------------------------------- #
     while inPlay:
-
+        
         pygame.event.clear()
 
         # Redraws the game window
@@ -1323,7 +1434,7 @@ while restart:
     lastApple = 0
 
     # Resets the snake - gives it 4 segments to start
-    for i in range(4):
+    for i in range(INITIAL_SEGMENTS):
         blocksX.append(BLOCK_X // 2)
         blocksY.append(BLOCK_Y // 2 + i)
 
@@ -1341,67 +1452,19 @@ while restart:
 
     # Endscreen - You lose or win the game ####################################
     if endScreen:
-        # resets level to 1
-        level = 1
+        # resets level to 1 if adventure mode and the player has not won
+        if not win and not endless:
+            level = 1
 
         # Clears obstacles - MIGHT NOT BE NEEDED, TEST LATER
         obstaclesX.clear()
         obstaclesY.clear()
 
-        pygame.event.clear()
-        gameWindow.fill(BLACK)
-
-        # Draws the exit and play again buttons
-        restartButton = pygame.draw.rect(gameWindow, WHITE, (270, 300, 280, 100), 4)
-        exitButton = pygame.draw.rect(gameWindow, WHITE, (310, 490, 200, 60), 4)
-
-        # Draws icons depending on game mode
-        if win:
-            if level > 0:
-                gameWindow.blit(trophy, (315, 30))
-            if level == -1:
-                gameWindow.blit(clock, (315, 30))
-
-        # You lost :(
-        else:
-            gameWindow.blit(icon, (270, 0))
-
-        # Endscreen Text
-        restartText = menuFont.render("Play Again?", True, WHITE)
-        exitText = menuFont.render("Exit", True, WHITE)
-        gameWindow.blit(restartText, (282, 325))
-        gameWindow.blit(exitText, (365, 495))
-
-        pygame.display.update()
-
         keys = pygame.key.get_pressed()
         mousePos = pygame.mouse.get_pos()
-        mousePressed = pygame.mouse.get_pressed(3)[0]
+        clicked = pygame.mouse.get_pressed(3)[0]
 
-        # Resets if restart is pressed
-        if restartButton.collidepoint(mousePos) and mousePressed:
-            # Stops sounds
-            nextLevelSound.stop()
-            lose.stop()
-
-            # Sets level if endless mode is on
-            if endless:
-                level = ENDLESS
-
-            # Displaying level if adventure mode, displays "Endless Mode" is endless mode is on
-            if not endless:
-                displayLevel(level)
-            elif endless:
-                displayLevel(0, endlessMode=True)
-
-            inPlay = True
-
-        if exitButton.collidepoint(mousePos) and mousePressed:
-            endScreen = False
-            restart = False
-
-        # Checks ESC and QUIT buttons
-        checkQuit()
+        drawEndMenu(mousePos, clicked)
 
 # ---------------------------------------#
 
