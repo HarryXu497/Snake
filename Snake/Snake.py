@@ -48,7 +48,7 @@ BLOCK_X = WIDTH // BLOCK_SIZE
 BLOCK_Y = HEIGHT // BLOCK_SIZE
 
 # Initial segments that you start with
-INITIAL_SEGMENTS = 0
+INITIAL_SEGMENTS = 4
 
 # Score #######################################################
 score = 0
@@ -83,6 +83,9 @@ menuFontLarger = pygame.font.Font("fonts/MENUFONT.ttf", 120)
 menuFontLarge = pygame.font.Font("fonts/MENUFONT.ttf", 60)
 menuFont = pygame.font.Font("fonts/MENUFONT.ttf", 40)
 menuFont2 = pygame.font.Font("fonts/MENUFONT.ttf", 20)
+
+menuFontTitle = pygame.font.Font("fonts/MENUFONTITLE.ttf", 80)
+
 
 # Sounds ######################################################################
 
@@ -325,40 +328,40 @@ def drawMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     global LCOLOUR, NCOLOUR, SCOLOUR, VLCOLOUR, menu, BLOCK_SIZE, inPlay
 
     # Title
-    titleRender = menuFontLarge.render("Grid Size", True, WHITE)
-    gameWindow.blit(titleRender, (260, 20))
+    titleRender = menuFontTitle.render("Grid Size", True, WHITE)
+    gameWindow.blit(titleRender, (235, 20))
 
     # Button rectangles/outlines
-    smallButton = pygame.draw.rect(gameWindow, LCOLOUR, (100, 120, 250, 150), 4)
-    largeButton = pygame.draw.rect(gameWindow, NCOLOUR, (100, 370, 250, 150), 4)
-    normalButton = pygame.draw.rect(gameWindow, SCOLOUR, (450, 120, 250, 150), 4)
-    veryLargeButton = pygame.draw.rect(gameWindow, VLCOLOUR, (450, 370, 250, 150), 4)
+    smallButton = pygame.draw.rect(gameWindow, LCOLOUR, (100, 120, 250, 200), 4)
+    largeButton = pygame.draw.rect(gameWindow, NCOLOUR, (100, 370, 250, 200), 4)
+    normalButton = pygame.draw.rect(gameWindow, SCOLOUR, (450, 120, 250, 200), 4)
+    veryLargeButton = pygame.draw.rect(gameWindow, VLCOLOUR, (450, 370, 250, 200), 4)
 
     # Button Text #############################################################
 
     # Small grid button
     smallGridRender = menuFont.render("Small", True, WHITE)
     smallGridRenderSub = menuFont2.render(f"{int(WIDTH // 40)} x {int(HEIGHT // 40)}", True, WHITE)
-    gameWindow.blit(smallGridRender, (165, 150))
-    gameWindow.blit(smallGridRenderSub, (185, 205))
+    gameWindow.blit(smallGridRender, (165, 175))
+    gameWindow.blit(smallGridRenderSub, (185, 230))
 
     # Normal grid button
     normalGridRender = menuFont.render("Normal", True, WHITE)
     normalGridRenderSub = menuFont2.render(f"{int(WIDTH // 25)} x {int(HEIGHT // 25)}", True, WHITE)
-    gameWindow.blit(normalGridRender, (500, 150))
-    gameWindow.blit(normalGridRenderSub, (535, 205))
+    gameWindow.blit(normalGridRender, (500, 175))
+    gameWindow.blit(normalGridRenderSub, (535, 230))
 
     # Large grid button
     largeGridRender = menuFont.render("Large", True, WHITE)
     largeGridRenderSub = menuFont2.render(f"{int(WIDTH // 12.5)} x {int(HEIGHT // 12.5)}", True, WHITE)
-    gameWindow.blit(largeGridRender, (165, 400))
-    gameWindow.blit(largeGridRenderSub, (185, 455))
+    gameWindow.blit(largeGridRender, (165, 425))
+    gameWindow.blit(largeGridRenderSub, (185, 480))
 
     # Very Large grid button
     veryLargeGridRender = menuFont.render("Very Large", True, WHITE)
     veryLargeGridRenderSub = menuFont2.render(f"{int(WIDTH // 10)} x {int(HEIGHT // 10)}", True, WHITE)
-    gameWindow.blit(veryLargeGridRender, (460, 400))
-    gameWindow.blit(veryLargeGridRenderSub, (530, 455))
+    gameWindow.blit(veryLargeGridRender, (460, 425))
+    gameWindow.blit(veryLargeGridRenderSub, (535, 480))
 
     # ----------------------------------------------------------------------- #
 
@@ -466,8 +469,8 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     global LCOLOUR, NCOLOUR, SCOLOUR, VLCOLOUR, menu, BLOCK_SIZE, inPlay, endless
 
     # Title
-    titleRender = menuFontLarge.render("Game Mode", True, WHITE)
-    gameWindow.blit(titleRender, (230, 20))
+    titleRender = menuFontTitle.render("Game Mode", True, WHITE)
+    gameWindow.blit(titleRender, (190, 20))
 
     # Button rectangles/outline
     adventureButton = pygame.draw.rect(gameWindow, LCOLOUR, (100, 120, 250, 450), 4)
