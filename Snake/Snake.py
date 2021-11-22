@@ -20,6 +20,7 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 RED = (255, 66, 66)
+SCORE_RED = (255, 0, 0)
 DRED = (222, 33, 33)
 GREY = (25, 25, 25)
 LGREY = (140, 140, 140)
@@ -61,7 +62,8 @@ applesNeeded = 8
 ENDLESS = -1
 
 # Setting game window
-gameWindow = pygame.display.set_mode((WIDTH, HEIGHT))
+gameWindow = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF)
+# gameWindow = pygame.display.set_mode((WIDTH, HEIGHT), pygame.DOUBLEBUF, pygame.FULLSCREEN)
 
 # Images ######################################################
 icon = pygame.image.load("images/icon.png")
@@ -89,7 +91,7 @@ menuFontTitle = pygame.font.Font("fonts/MENUFONTITLE.ttf", 80)
 # Sounds ######################################################################
 
 # Theme
-pygame.mixer.init()
+pygame.mixer.init()  # I don't think this is needed - test later
 pygame.mixer.music.load("sounds/THEME.mp3")
 pygame.mixer.music.set_volume(0.8)
 
@@ -201,8 +203,15 @@ def redrawGameWindow() -> None:
     gameWindow.fill(BLACK)
 
     # Turns the timer colour to red if there is less than 10 seconds
-    if timeLeft <= 10:
-        TIME_COLOUR = RED
+    if timeLeft <= 20:
+        if round(timeLeft) % 2 == 0:
+            TIME_COLOUR = SCORE_RED
+        else:
+            TIME_COLOUR = WHITE
+
+    # Ends the game if time runs out
+    if timeLeft <= 0:
+        inPlay = False
 
     # Draws the grid ##########################################################
     for j in range(round(BLOCK_X)):
@@ -285,9 +294,11 @@ def redrawGameWindow() -> None:
     # ----------------------------------------------------------------------- #
 
     # Setting clock to timer/stopwatch for endless/adventure ##################
-    if level > 0 and not win:
+    if level >= 0 and not win:
         displayTime(timeLeft, 10, 10, TIME_COLOUR)
+
     elif level == ENDLESS and not win:
+
         displayTime(stopwatch, 10, 10, TIME_COLOUR)
 
     # ----------------------------------------------------------------------- #
@@ -297,10 +308,6 @@ def redrawGameWindow() -> None:
     timeLeft -= time / 1000  # Adventure mode timer
     stopwatch += time / 1000  # Endless mode stopwatch
     lastApple += time / 1000  # Records the time since the last apple was eaten
-
-    # Ends the game if time runs out
-    if timeLeft <= 0:
-        inPlay = False
 
     # Generates apple if no apples are consumed in the last n seconds
     if lastApple >= LASTAPPLETIME:
@@ -1059,6 +1066,7 @@ def checkLevelParams() -> None:
     """
     Sets the appropriate goal and time left for each level
     A lot of if/elifs :(
+    I wish there were switch-case statements
 
     Return => None
     """
@@ -1067,6 +1075,7 @@ def checkLevelParams() -> None:
     if level == 1:
         timeLeft = 180
         applesNeeded = 8
+
 
     # Sets the goal and time for level 2 ######################################
     elif level == 2:
