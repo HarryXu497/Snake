@@ -129,6 +129,18 @@ LASTAPPLETIME = 15
 # speed
 delay = 65
 
+# death animation time - speeds up the death animation after the sound effect ends
+deathAnimationTime = 0
+
+# death stopwatch time - to control the rate at which the snake "dies"
+deathAnimationStopwatch = 0
+
+# The rate of the death animation
+# we use 2 variables because we need to reset the rate of death to the same as before between levels
+rateOfDeathAnimationInit = 10
+
+rateOfDeathAnimation = rateOfDeathAnimationInit
+
 # --------------------------------------------------------------------------- #
 
 
@@ -633,6 +645,148 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     # Updating Screen
     pygame.display.update()
+
+
+def drawDeathAnimation() -> None:
+    """
+    Redraws the game window when called. Draws the snake segments,
+    grid, apples and obstacles
+
+    Return => None
+    """
+    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch, inPlay, win, flipSegmentColour, deathAnimation, deathAnimationTime, deathAnimationStopwatch, rateOfDeathAnimation
+    TIME_COLOUR = WHITE
+    BLOCK_R = 72
+    BLOCK_G = 0
+    BLOCK_B = 255
+
+    pygame.event.clear()
+
+    gameWindow.fill(BLACK)
+
+    # Turns the timer colour to red if there is less than 10 seconds
+    if timeLeft <= 20:
+        if round(timeLeft) % 2 == 0:
+            TIME_COLOUR = SCORE_RED
+        else:
+            TIME_COLOUR = WHITE
+
+    # Draws the grid ##########################################################
+    for j in range(round(BLOCK_X)):
+        for k in range(round(BLOCK_Y)):
+            if j % 2 == 0 and k % 2 == 0:
+                pygame.draw.rect(gameWindow, GREY, (j * BLOCK_SIZE, k * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+
+    for j in range(round(BLOCK_X)):
+        for k in range(round(BLOCK_Y)):
+            if j % 2 == 1 and k % 2 == 1:
+                pygame.draw.rect(gameWindow, GREY, (j * BLOCK_SIZE, k * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE))
+
+    # ----------------------------------------------------------------------- #
+
+    # Draws the obstacles #####################################################
+    for j in range(len(obstaclesX)):
+        obsCoordX = obstaclesX[j]
+        obsCoordY = obstaclesY[j]
+        pygame.draw.rect(gameWindow, ORANGE, (obsCoordX * BLOCK_SIZE, obsCoordY * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
+                         0, ROUNDEDNESS_OBS)
+
+    # ----------------------------------------------------------------------- #
+
+    # Draws the snake segments ################################################
+    for j in range(len(blocksX)):
+        SEG_COLOUR = (BLOCK_R, BLOCK_G, BLOCK_B)
+        coord_x = blocksX[j]
+        coord_y = blocksY[j]
+
+        pygame.draw.rect(gameWindow, SEG_COLOUR, (coord_x * BLOCK_SIZE, coord_y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE),
+                         0, ROUNDEDNESS)
+
+        # Changes the color to make a gradient
+        if BLOCK_R + 20 <= 255 and not flipSegmentColour:
+            BLOCK_R += 10
+
+        elif BLOCK_R + 20 > 255:
+            flipSegmentColour = True
+
+        if BLOCK_G + 20 <= 255 and not flipSegmentColour:
+            BLOCK_G += 10
+
+        if BLOCK_R > 82 and flipSegmentColour:
+            BLOCK_R -= 10
+
+        elif BLOCK_R <= 82:
+            flipSegmentColour = False
+
+        if BLOCK_G - 20 >= 0 and flipSegmentColour:
+            BLOCK_G -= 10
+
+        # ----------------------------------------------------------------------- #
+
+    # Draws the apples ########################################################
+    for j in range(len(appleX)):
+        apple_x = appleX[j]
+        apple_y = appleY[j]
+        pygame.draw.circle(gameWindow, RED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2)
+        pygame.draw.circle(gameWindow, DRED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2, 2)
+
+    # ----------------------------------------------------------------------- #
+
+    # Setting the score for endless/adventure #################################
+    if level > 0 and not win:
+        # Renders the font, depending on the game mode
+        scoreRender = scoreFont.render(f"{score}/{applesNeeded}", True, WHITE)
+        gameWindow.blit(scoreRender, (WIDTH - 70, 10))
+
+    elif level == ENDLESS and not win:
+        # Renders the font, depending on the game mode
+        leadZero = "0" if score < 10 else ""
+        scoreRender = scoreFont.render(f"{leadZero}{score}", True, WHITE)
+        gameWindow.blit(scoreRender, (WIDTH - 50, 10))
+
+    # ----------------------------------------------------------------------- #
+
+    # Setting clock to timer/stopwatch for endless/adventure ##################
+    if level >= 0 and not win:
+        displayTime(timeLeft, 10, 10, TIME_COLOUR)
+
+    elif level == ENDLESS and not win:
+
+        displayTime(stopwatch, 10, 10, TIME_COLOUR)
+
+    # ----------------------------------------------------------------------- #
+    # Accumulating time
+    time = fpsClock.tick(FPS)
+    deathAnimationStopwatch += time / 1000  # "rate of death"
+    deathAnimationTime += time / 1000  # actual - to speed up death after the sound effect ends
+
+    if deathAnimation:
+        # stops the music
+        pygame.mixer.music.stop()
+
+        # if space is pressed, skip through the animation
+        if keys[pygame.K_SPACE]:
+            deathAnimation = False
+            inPlay = False
+
+        # when the sound effect ends, speed up the death animation
+        if deathAnimationTime > 3:
+            rateOfDeathAnimation = 2
+
+        if int(deathAnimationStopwatch) % rateOfDeathAnimation == 0:
+            # if there are elements, pop them
+            if len(blocksX) >= 1:
+                blocksX.pop(0)
+                blocksY.pop(0)
+            # end the animation if there are no more elements
+            else:
+                deathAnimation = False
+                inPlay = False
+        deathAnimationStopwatch += 1
+
+    # Updating screen
+    pygame.display.update()
+
 
 
 def checkCollision() -> bool:
@@ -1170,7 +1324,7 @@ def displayLevel(levelToDisplay: int, endlessMode: bool = False) -> None:
 
 
 def checkQuit():
-    global inPlay, restart, permaExit, menu, restart
+    global inPlay, restart, permaExit, menu, restart, deathAnimation, endScreen
 
     # ESC key and QUIT button
     if keys[pygame.K_ESCAPE]:
@@ -1179,6 +1333,8 @@ def checkQuit():
         permaExit = True
         menu = False
         restart = False
+        deathAnimation = False
+        endScreen = False
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -1187,6 +1343,8 @@ def checkQuit():
             permaExit = True
             menu = False
             restart = False
+            deathAnimation = False
+            endScreen = False
 
 
 ###############################################################################
@@ -1207,6 +1365,7 @@ nextLevel = False
 endless = False
 win = False
 flipSegmentColour = False
+deathAnimation = False
 
 # --------------------------------------------------- #
 #
@@ -1400,6 +1559,7 @@ while restart:
 
         # Check for collision #################################
         if checkCollision():
+            deathAnimation = True
             inPlay = False
 
             # Sets logging string
@@ -1422,6 +1582,11 @@ while restart:
     if not permaExit:
         endScreen = True
 
+    while deathAnimation:
+        keys = pygame.key.get_pressed()
+        drawDeathAnimation()
+        checkQuit()
+
     # Resetting game ##########################################################
     # clears the blocks
     blocksX.clear()
@@ -1437,6 +1602,15 @@ while restart:
     DIRECTION = UP
     appleGenerated = False
     lastApple = 0
+
+    # death animation reset
+    # death animation time - speeds up the death animation after the sound effect ends
+    deathAnimationTime = 0
+
+    # death stopwatch time - to control the rate at which the snake "dies"
+    deathAnimationStopwatch = 0
+
+    rateOfDeathAnimation = rateOfDeathAnimationInit
 
     # ----------------------------------------------------------------------- #
 
@@ -1465,6 +1639,7 @@ while restart:
         clicked = pygame.mouse.get_pressed(3)[0]
 
         drawEndMenu(mousePos, clicked)
+
 
 # ---------------------------------------#
 
