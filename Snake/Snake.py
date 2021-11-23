@@ -49,7 +49,7 @@ BLOCK_X = WIDTH // BLOCK_SIZE
 BLOCK_Y = HEIGHT // BLOCK_SIZE
 
 # Initial segments that you start with
-INITIAL_SEGMENTS = 4
+INITIAL_SEGMENTS = 767
 
 # Score #######################################################
 score = 0
@@ -566,7 +566,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     Return => None
     """
-    global RCOLOUR, ECOLOUR, level, win, inPlay, endScreen, restart, keys
+    global RCOLOUR, ECOLOUR, level, win, inPlay, endScreen, restart, keys, deathAnimation
     pygame.event.clear()
     gameWindow.fill(BLACK)
 
@@ -582,6 +582,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     # Draws icons depending on game mode ######################################
     if win:
+        deathAnimation = False
         if level > 0:
             gameWindow.blit(trophy, (315, 30))
         if level == ENDLESS:
@@ -613,6 +614,8 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
         # Sets level if endless mode is on
         if endless:
             level = ENDLESS
+        else:
+            level = 1
 
         # Displaying level if adventure mode, displays "Endless Mode" is endless mode is on
         if not endless:
@@ -620,6 +623,8 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
         elif endless:
             displayLevel(0, endlessMode=True)
         inPlay = True
+        deathAnimation = False
+        win = False
 
     # ----------------------------------------------------------------------- #
 
@@ -630,7 +635,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     if not exitButton.collidepoint(mousePosition):
         ECOLOUR = WHITE
-
+    print("ee")
     # ----------------------------------------------------------------------- #
 
     # Resets if restart is pressed ############################################
@@ -1559,7 +1564,7 @@ while restart:
         # ------------------------------------------------------------------- #
 
         # Check for collision #################################
-        if checkCollision():
+        if checkCollision() and not win:
             deathAnimation = True
             inPlay = False
 
@@ -1628,7 +1633,7 @@ while restart:
     # Endscreen - You lose or win the game ####################################
     if endScreen:
         # resets level to 1 if adventure mode and the player has not won
-        if not win and not endless:
+        if not endless:
             level = 1
 
         # Clears obstacles - MIGHT NOT BE NEEDED, TEST LATER
@@ -1639,6 +1644,8 @@ while restart:
         mousePos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed(3)[0]
 
+        print("ee")
+        
         drawEndMenu(mousePos, clicked)
 
 
