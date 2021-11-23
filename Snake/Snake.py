@@ -49,7 +49,7 @@ BLOCK_X = WIDTH // BLOCK_SIZE
 BLOCK_Y = HEIGHT // BLOCK_SIZE
 
 # Initial segments that you start with
-INITIAL_SEGMENTS = 4
+INITIAL_SEGMENTS = 767
 
 # Score #######################################################
 score = 0
@@ -281,8 +281,12 @@ def redrawGameWindow() -> None:
     for j in range(len(appleX)):
         apple_x = appleX[j]
         apple_y = appleY[j]
-        pygame.draw.circle(gameWindow, RED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2)
-        pygame.draw.circle(gameWindow, DRED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2, 2)
+        pygame.draw.circle(gameWindow, RED,
+                           (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2),
+                           BLOCK_SIZE / 2)
+        pygame.draw.circle(gameWindow, DRED,
+                           (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2),
+                           BLOCK_SIZE / 2, 2)
 
     # ----------------------------------------------------------------------- #
 
@@ -635,7 +639,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     if not exitButton.collidepoint(mousePosition):
         ECOLOUR = WHITE
-        
+
     # ----------------------------------------------------------------------- #
 
     # Resets if restart is pressed ############################################
@@ -732,8 +736,12 @@ def drawDeathAnimation() -> None:
     for j in range(len(appleX)):
         apple_x = appleX[j]
         apple_y = appleY[j]
-        pygame.draw.circle(gameWindow, RED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2)
-        pygame.draw.circle(gameWindow, DRED, (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2), BLOCK_SIZE / 2, 2)
+        pygame.draw.circle(gameWindow, RED,
+                           (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2),
+                           BLOCK_SIZE / 2)
+        pygame.draw.circle(gameWindow, DRED,
+                           (apple_x * BLOCK_SIZE + BLOCK_SIZE / 2, apple_y * BLOCK_SIZE + BLOCK_SIZE / 2),
+                           BLOCK_SIZE / 2, 2)
 
     # ----------------------------------------------------------------------- #
 
@@ -761,13 +769,12 @@ def drawDeathAnimation() -> None:
 
     # ----------------------------------------------------------------------- #
 
-
     if deathAnimation:
         # Accumulating time
         time = fpsClock.tick(FPS)
         deathAnimationStopwatch += time / 1000  # "rate of death"
         deathAnimationTime += time / 1000  # actual - to speed up death after the sound effect ends
-        
+
         # stops the music
         pygame.mixer.music.stop()
 
@@ -792,12 +799,11 @@ def drawDeathAnimation() -> None:
                 deathAnimation = False
                 inPlay = False
         deathAnimationStopwatch += 1
-        
+
     if win:
         deathAnimation = False
     # Updating screen
     pygame.display.update()
-
 
 
 def checkCollision() -> bool:
@@ -1569,8 +1575,8 @@ while restart:
         # ------------------------------------------------------------------- #
 
         # Check for collision #################################
-        if checkCollision() and not win:
-            deathAnimation = True
+        if checkCollision():
+            deathAnimation = False if win else True
             inPlay = False
 
             # Sets logging string
@@ -1648,9 +1654,8 @@ while restart:
         keys = pygame.key.get_pressed()
         mousePos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed(3)[0]
-        
-        drawEndMenu(mousePos, clicked)
 
+        drawEndMenu(mousePos, clicked)
 
 # ---------------------------------------#
 
