@@ -770,7 +770,7 @@ def drawDeathAnimation() -> None:
             inPlay = False
 
         # when the sound effect ends, speed up the death animation
-        if deathAnimationTime > 3:
+        if deathAnimationTime > 2.8:
             rateOfDeathAnimation = 2
 
         if int(deathAnimationStopwatch) % rateOfDeathAnimation == 0:
