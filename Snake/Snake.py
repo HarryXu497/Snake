@@ -49,7 +49,7 @@ BLOCK_X = WIDTH // BLOCK_SIZE
 BLOCK_Y = HEIGHT // BLOCK_SIZE
 
 # Initial segments that you start with
-INITIAL_SEGMENTS = 767
+INITIAL_SEGMENTS = 4
 
 # Score #######################################################
 score = 0
@@ -760,12 +760,14 @@ def drawDeathAnimation() -> None:
         displayTime(stopwatch, 10, 10, TIME_COLOUR)
 
     # ----------------------------------------------------------------------- #
-    # Accumulating time
-    time = fpsClock.tick(FPS)
-    deathAnimationStopwatch += time / 1000  # "rate of death"
-    deathAnimationTime += time / 1000  # actual - to speed up death after the sound effect ends
+
 
     if deathAnimation:
+        # Accumulating time
+        time = fpsClock.tick(FPS)
+        deathAnimationStopwatch += time / 1000  # "rate of death"
+        deathAnimationTime += time / 1000  # actual - to speed up death after the sound effect ends
+        
         # stops the music
         pygame.mixer.music.stop()
 
@@ -1633,7 +1635,6 @@ while restart:
         endScreen = False
         nextLevel = False
 
-    print(endScreen)
     # Endscreen - You lose or win the game ####################################
     if endScreen:
         # resets level to 1 if adventure mode and the player has not won
