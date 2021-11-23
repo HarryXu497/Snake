@@ -780,6 +780,7 @@ def drawDeathAnimation() -> None:
                 blocksY.pop(0)
             # end the animation if there are no more elements
             else:
+                pygame.time.delay(300)
                 deathAnimation = False
                 inPlay = False
         deathAnimationStopwatch += 1
