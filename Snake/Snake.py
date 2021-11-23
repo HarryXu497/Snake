@@ -635,7 +635,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     if not exitButton.collidepoint(mousePosition):
         ECOLOUR = WHITE
-    print("ee")
+        
     # ----------------------------------------------------------------------- #
 
     # Resets if restart is pressed ############################################
@@ -659,7 +659,7 @@ def drawDeathAnimation() -> None:
 
     Return => None
     """
-    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch, inPlay, win, flipSegmentColour, deathAnimation, deathAnimationTime, deathAnimationStopwatch, rateOfDeathAnimation
+    global appleGenerated, lastApple, timeLeft, applesNeeded, stopwatch, inPlay, win, flipSegmentColour, deathAnimation, deathAnimationTime, deathAnimationStopwatch, rateOfDeathAnimation, endScreen
     TIME_COLOUR = WHITE
     BLOCK_R = 72
     BLOCK_G = 0
@@ -773,6 +773,7 @@ def drawDeathAnimation() -> None:
         if keys[pygame.K_SPACE]:
             deathAnimation = False
             inPlay = False
+            endScreen = True
 
         # when the sound effect ends, speed up the death animation
         if deathAnimationTime > 2.8:
@@ -789,7 +790,9 @@ def drawDeathAnimation() -> None:
                 deathAnimation = False
                 inPlay = False
         deathAnimationStopwatch += 1
-
+        
+    if win:
+        deathAnimation = False
     # Updating screen
     pygame.display.update()
 
@@ -1630,6 +1633,7 @@ while restart:
         endScreen = False
         nextLevel = False
 
+    print(endScreen)
     # Endscreen - You lose or win the game ####################################
     if endScreen:
         # resets level to 1 if adventure mode and the player has not won
@@ -1643,8 +1647,6 @@ while restart:
         keys = pygame.key.get_pressed()
         mousePos = pygame.mouse.get_pos()
         clicked = pygame.mouse.get_pressed(3)[0]
-
-        print("ee")
         
         drawEndMenu(mousePos, clicked)
 
