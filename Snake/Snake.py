@@ -144,7 +144,7 @@ stopwatch = 0
 lastApple = 0
 
 # when lastApple is equal to this, a new apple is generated
-LASTAPPLETIME = 15
+LASTAPPLETIME = 0
 
 # speed
 delay = 65
@@ -931,6 +931,11 @@ def generateAppleCheck(apple_x: int, apple_y: int) -> bool:
         if apple_x == obstaclesX[j] and apple_y == obstaclesY[j]:
             return False
 
+    # Checks if the apple is in another apple
+    for j in range(len(appleX)):
+        if apple_x == appleX[j] and apple_y == appleY[j]:
+            return False
+
     # The apple's coordinates are valid
     return True
 
@@ -948,18 +953,19 @@ def checkApple() -> bool:
     coord_y = blocksY[0]
 
     # Iterating through the apple coordinate lists
-    if coord_x in appleX and coord_y in appleY:
-        for j in range(len(appleX) - 1, -1, -1):  # Goes backward as to not cause an IndexError: "index out of range"
-            if appleX[j] == coord_x and appleY[j] == coord_y:
-                del appleX[j]
-                del appleY[j]
+    for j in range(len(appleX) - 1, -1, -1):  # Goes backward as to not cause an IndexError: "index out of range"
+        if appleX[j] == coord_x and appleY[j] == coord_y:
+            del appleX[j]
+            del appleY[j]
+            appleEat.play()
+            return True
 
-        # If there are no apples, generated one
-        if len(appleX) == 0:
-            appleGenerated = False
-            lastApple = 0
-        appleEat.play()
-        return True
+    # If there are no apples, generated one
+    if len(appleX) == 0:
+        appleGenerated = False
+        lastApple = 0
+
+    return False
 
     # Apple not eaten
     return False
