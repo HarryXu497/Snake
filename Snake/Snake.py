@@ -408,8 +408,8 @@ def drawMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     ## Small button ###########################################
     if smallButton.collidepoint(mousePosition):
         # changes colour to grey on hover
-        LCOLOUR = BLACK
-        smallButton = pygame.draw.rect(gameWindow, LGREY, (95, 115, 260, 210), 4)
+        LCOLOUR = BLACK  # turns original rectangle black and makes a slightly larger grey one
+        smallButton = pygame.draw.rect(gameWindow, LGREY, (98, 118, 254, 204), 4)
 
     if not smallButton.collidepoint(mousePosition):
         LCOLOUR = WHITE
@@ -429,8 +429,8 @@ def drawMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     ## Normal button ##########################################
     if normalButton.collidepoint(mousePosition):
         # changes colour to grey on hover
-        SCOLOUR = BLACK
-        normalButton = pygame.draw.rect(gameWindow, LGREY, (445, 115, 260, 210), 4)
+        SCOLOUR = BLACK  # turns original rectangle black and makes a slightly larger grey one
+        normalButton = pygame.draw.rect(gameWindow, LGREY, (448, 118, 254, 204), 4)
 
     if not normalButton.collidepoint(mousePosition):
         SCOLOUR = WHITE
@@ -450,8 +450,8 @@ def drawMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     ## Large button ###########################################
     if largeButton.collidepoint(mousePosition):
         # changes colour to grey on hover
-        NCOLOUR = BLACK
-        largeButton = pygame.draw.rect(gameWindow, LGREY, (95, 365, 260, 210), 4)
+        NCOLOUR = BLACK  # turns original rectangle black and makes a slightly larger grey one
+        largeButton = pygame.draw.rect(gameWindow, LGREY, (98, 368, 254, 204), 4)
 
     if not largeButton.collidepoint(mousePosition):
         NCOLOUR = WHITE
@@ -471,8 +471,8 @@ def drawMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     ## Very Large button ######################################
     if veryLargeButton.collidepoint(mousePosition):
         # changes colour to grey on hover
-        VLCOLOUR = BLACK
-        veryLargeButton = pygame.draw.rect(gameWindow, LGREY, (445, 365, 260, 210), 4)
+        VLCOLOUR = BLACK  # turns original rectangle black and makes a slightly larger grey one
+        veryLargeButton = pygame.draw.rect(gameWindow, LGREY, (448, 368, 254, 204), 4)
 
     if not veryLargeButton.collidepoint(mousePosition):
         VLCOLOUR = WHITE
@@ -540,7 +540,8 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     # Adventure button ########################################
     if adventureButton.collidepoint(mousePosition):
         # button turns grey on hover
-        LCOLOUR = LGREY
+        LCOLOUR = BLACK  # turns original rectangle black and makes a slightly larger grey one
+        adventureButton = pygame.draw.rect(gameWindow, LGREY, (98, 118, 254, 454), 4)
 
     if not adventureButton.collidepoint(mousePosition):
         LCOLOUR = WHITE
@@ -559,7 +560,8 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     # Endless button ##########################################
     if endlessButton.collidepoint(mousePosition):
         # button turns grey on hover
-        VLCOLOUR = LGREY
+        VLCOLOUR = BLACK  # turns original rectangle black and makes a slightly larger grey one
+        endlessButton = pygame.draw.rect(gameWindow, LGREY, (448, 118, 254, 454), 4)
 
     if not endlessButton.collidepoint(mousePosition):
         clockNum = 0
