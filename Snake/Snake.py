@@ -71,8 +71,25 @@ icon = pygame.image.load("images/icon.png")
 trophy = pygame.image.load("images/trophy.png")
 trophy = pygame.transform.scale(trophy, (200, 200))
 
-clock = pygame.image.load("images/clock.png")
-clock = pygame.transform.scale(clock, (200, 200))
+clock = [
+    pygame.image.load("images/clock/clock1.png"),
+    pygame.image.load("images/clock/clock2.png"),
+    pygame.image.load("images/clock/clock3.png"),
+    pygame.image.load("images/clock/clock4.png"),
+    pygame.image.load("images/clock/clock5.png"),
+    pygame.image.load("images/clock/clock6.png"),
+    pygame.image.load("images/clock/clock7.png"),
+    pygame.image.load("images/clock/clock8.png"),
+]
+
+for i in range(len(clock)):
+    clock[i] = pygame.transform.scale(clock[i], (200, 200))
+
+# For controlling clock animation
+clockNum = 0
+
+# Responsible for icon bobbing
+iconBobbing = 0
 
 # Icon, Caption and Cursor ####################################
 pygame.display.set_icon(icon)  # setting icon
@@ -488,7 +505,7 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     pygame.event.clear()
     gameWindow.fill(BLACK)
 
-    global LCOLOUR, NCOLOUR, SCOLOUR, VLCOLOUR, menu, BLOCK_SIZE, inPlay, endless
+    global LCOLOUR, NCOLOUR, SCOLOUR, VLCOLOUR, menu, BLOCK_SIZE, inPlay, endless, clockNum, iconBobbing
 
     # Title
     titleRender = menuFontTitle.render("Game Mode", True, WHITE)
@@ -499,8 +516,8 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     endlessButton = pygame.draw.rect(gameWindow, VLCOLOUR, (450, 120, 250, 450), 4)
 
     # Blitting the icons to the game modes
-    gameWindow.blit(trophy, (125, 340))
-    gameWindow.blit(clock, (475, 340))
+    gameWindow.blit(trophy, (125, 330 if iconBobbing > 4 else 340))
+    gameWindow.blit(clock[int(clockNum)] if endlessButton.collidepoint(mousePosition) else clock[0], (475, 340 if iconBobbing > 4 else 330))
 
     # Button Text #############################################################
     SmallGridRender = menuFont.render("Adventure", True, WHITE)
@@ -542,6 +559,7 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
         VLCOLOUR = LGREY
 
     if not endlessButton.collidepoint(mousePosition):
+        clockNum = 0
         VLCOLOUR = WHITE
 
     if endlessButton.collidepoint(mousePosition) and mouseClicked:
@@ -557,6 +575,14 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     # ----------------------------------------------------------------------- #
 
+    clockNum += 0.005
+    iconBobbing += 0.005
+    if iconBobbing >= 8:
+        iconBobbing = 0
+
+    if clockNum >= len(clock):
+        clockNum = 0
+
     pygame.display.update()
 
 
@@ -570,7 +596,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     Return => None
     """
-    global RCOLOUR, ECOLOUR, level, win, inPlay, endScreen, restart, keys, deathAnimation
+    global RCOLOUR, ECOLOUR, level, win, inPlay, endScreen, restart, keys, deathAnimation, clockNum
     pygame.event.clear()
     gameWindow.fill(BLACK)
 
@@ -590,7 +616,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
         if level > 0:
             gameWindow.blit(trophy, (315, 30))
         if level == ENDLESS:
-            gameWindow.blit(clock, (315, 30))
+            gameWindow.blit(clock[clockNum], (315, 30))
 
     # You lost :(
     else:
