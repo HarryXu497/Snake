@@ -91,6 +91,9 @@ clockNum = 0
 # Responsible for icon bobbing
 iconBobbing = 0
 
+# speed of icon bobbing and animation
+ICON_SPEED = 0.01
+
 # Icon, Caption and Cursor ####################################
 pygame.display.set_icon(icon)  # setting icon
 pygame.display.set_caption("Snake")
@@ -580,8 +583,8 @@ def drawTypeMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     # ----------------------------------------------------------------------- #
 
-    clockNum += 0.005
-    iconBobbing += 0.005
+    clockNum += ICON_SPEED
+    iconBobbing += ICON_SPEED
     if iconBobbing >= 8:
         iconBobbing = 0
 
@@ -683,7 +686,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
     # Checks ESC and QUIT buttons
     checkQuit()
 
-    clockNum += 0.005
+    clockNum += ICON_SPEED
     if clockNum >= len(clock):
         clockNum = 0
 
