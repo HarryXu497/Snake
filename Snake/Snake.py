@@ -965,8 +965,6 @@ def checkApple() -> bool:
         appleGenerated = False
         lastApple = 0
 
-    return False
-
     # Apple not eaten
     return False
 
@@ -1513,7 +1511,7 @@ elif endless and restart:
     displayLevel(0, endlessMode=True)
 
 # Sets the roundedness to be proportion to the block size
-ROUNDEDNESS = int((BLOCK_SIZE * 3) // 25)
+# ROUNDEDNESS = int((BLOCK_SIZE * 3) // 25)
 
 while restart:
     # reset time and clock
@@ -1627,6 +1625,11 @@ while restart:
         blocksY[0] += stepY
 
         # ------------------------------------------------------------------- #
+
+        # Checks if the player has won
+        # checks before the collision check to avoid scenarios
+        # where the player wins but the collision activates the death animation
+        checkWin()
 
         # Check for collision #################################
         if checkCollision():
