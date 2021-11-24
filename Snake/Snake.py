@@ -331,7 +331,6 @@ def redrawGameWindow() -> None:
         displayTime(timeLeft, 10, 10, TIME_COLOUR)
 
     elif level == ENDLESS and not win:
-
         displayTime(stopwatch, 10, 10, TIME_COLOUR)
 
     # ----------------------------------------------------------------------- #
@@ -616,7 +615,7 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
         if level > 0:
             gameWindow.blit(trophy, (315, 30))
         if level == ENDLESS:
-            gameWindow.blit(clock[clockNum], (315, 30))
+            gameWindow.blit(clock[int(clockNum)], (315, 30))
 
     # You lost :(
     else:
@@ -677,6 +676,11 @@ def drawEndMenu(mousePosition: tuple[int, int], mouseClicked: bool) -> None:
 
     # Checks ESC and QUIT buttons
     checkQuit()
+
+    clockNum += 0.005
+    if clockNum >= len(clock):
+        clockNum = 0
+
 
     # Updating Screen
     pygame.display.update()
@@ -1028,7 +1032,7 @@ def generateCheckLevel(obs_x: int, obs_y: int) -> bool:
 
     # Prevents obstacles from being spawned in the snake
     for j in range(int(INITIAL_SEGMENTS)):
-        if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 - 1:
+        if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 - j:
             return False
 
     return True
@@ -1488,6 +1492,7 @@ if not endless and restart:
 elif endless and restart:
     displayLevel(0, endlessMode=True)
 
+
 while restart:
     # reset time and clock
     fpsClock = pygame.time.Clock()
@@ -1497,9 +1502,10 @@ while restart:
     checkLevelParams()
 
     # add coordinates for the head and 3 segments
-    for i in range(INITIAL_SEGMENTS):
-        blocksX.append(BLOCK_X // 2)
-        blocksY.append(BLOCK_Y // 2 + i)
+    if not endScreen:
+        for i in range(INITIAL_SEGMENTS):
+            blocksX.append(BLOCK_X // 2)
+            blocksY.append(BLOCK_Y // 2 + i)
 
     # --------------------------------------------------- #
     #
