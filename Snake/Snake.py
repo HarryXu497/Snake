@@ -49,7 +49,7 @@ BLOCK_X = WIDTH // BLOCK_SIZE
 BLOCK_Y = HEIGHT // BLOCK_SIZE
 
 # Initial segments that you start with
-INITIAL_SEGMENTS = 767
+INITIAL_SEGMENTS = 4
 
 # Score #######################################################
 score = 0
@@ -1502,7 +1502,7 @@ while restart:
     checkLevelParams()
 
     # add coordinates for the head and 3 segments
-    if not endScreen:
+    if not endScreen:  # we don't want to add segments just to clear them later
         for i in range(INITIAL_SEGMENTS):
             blocksX.append(BLOCK_X // 2)
             blocksY.append(BLOCK_Y // 2 + i)
