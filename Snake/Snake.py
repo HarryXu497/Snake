@@ -144,7 +144,7 @@ stopwatch = 0
 lastApple = 0
 
 # when lastApple is equal to this, a new apple is generated
-LASTAPPLETIME = 0
+LASTAPPLETIME = 15
 
 # speed
 delay = 65
