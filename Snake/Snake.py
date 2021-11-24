@@ -1041,13 +1041,18 @@ def generateCheckLevel(obs_x: int, obs_y: int) -> bool:
     Return => bool
     """
     # Prevents obstacles from being spawned directly in front of the snake head
-    for j in range(int(BLOCK_Y // 5)):
-        if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 + 1:
+    for j in range(int(BLOCK_Y // 4)):
+        if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 + j:
             return False
 
     # Prevents obstacles from being spawned in the snake
     for j in range(int(INITIAL_SEGMENTS)):
         if obs_x == BLOCK_X // 2 and obs_y == BLOCK_Y // 2 - j:
+            return False
+
+    # Prevents obstacles from being spawned in another obstacle
+    for j in range(len(obstaclesX)):
+        if obs_x == obstaclesX[j] and obs_y == obstaclesY[j]:
             return False
 
     return True
