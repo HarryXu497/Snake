@@ -1512,6 +1512,8 @@ if not endless and restart:
 elif endless and restart:
     displayLevel(0, endlessMode=True)
 
+# Sets the roundedness to be proportion to the block size
+ROUNDEDNESS = int((BLOCK_SIZE * 3) // 25)
 
 while restart:
     # reset time and clock
