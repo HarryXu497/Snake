@@ -1748,7 +1748,7 @@ with open("logs.csv", 'r') as log:
             if row[0] == "ADVENTURE":
                 print(f"{row[0]}  @ {row[1]}  [Level {row[2]}    | {row[4]}/{row[5]} Apples | {'{:.2f}'.format(float(row[3]))} left]")
             elif row[0] == "ENDLESS":
-                print(f"{row[0]}    @ {row[1]}  [Time: {'{:.2f}'.format(float(row[3]))} | {row[4]} Apples{' ' * 3 if int(row[4]) < 10 else ' ' * 2}]")
+                print(f"{row[0]}    @ {row[1]}  [Time: {'{:.2f}'.format(float(row[3]))} | {row[4]} Apples]")
         line_count += 1
 
 
