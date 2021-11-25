@@ -1731,7 +1731,7 @@ while restart:
 
 headers = ["Gamemode", "Datetime", "Level", "Time", "Score", "Apples Needed"]
 
-# Stores logs in txt file
+# Stores logs in csv file
 with open("logs.csv", 'a', encoding="UTF-8", newline='') as log:
 
     writer = csv.DictWriter(log, fieldnames=headers)
@@ -1739,6 +1739,7 @@ with open("logs.csv", 'a', encoding="UTF-8", newline='') as log:
     for game in games:
         writer.writerow(game)
 
+# reads logs and formats them
 with open("logs.csv", 'r') as log:
 
     reader = csv.reader(log, delimiter=',')
