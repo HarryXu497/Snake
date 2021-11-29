@@ -1002,13 +1002,11 @@ def checkScore() -> None:
 
     Return => None
     """
-    global score, delay
-    if score % 3 == 0:
-        speedMultiplier = score // 3
-        newDelay = delay - speedMultiplier
-        if newDelay <= 30:
-            newDelay = 30
-        delay = newDelay
+    global score, delay, increaseSpeed
+    if score > 0 and score % 3 == 0 and increaseSpeed:
+        if delay >= 35:
+            delay -= 3
+        increaseSpeed = False
 
 
 def checkWin() -> None:
@@ -1432,6 +1430,7 @@ endless = False
 win = False
 flipSegmentColour = False
 deathAnimation = False
+increaseSpeed = False
 
 # --------------------------------------------------- #
 #
@@ -1589,7 +1588,10 @@ while restart:
 
         # Checks if the snake has eaten an apple
         if checkApple():
-
+            # if the score is divisible by 3 and increaseSpeed is true,
+            # speed is increased
+            increaseSpeed = True
+            
             # Checks the score to decreases speed if it is necessary
             checkScore()
 
