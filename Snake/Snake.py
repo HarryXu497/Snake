@@ -965,6 +965,8 @@ def checkApple() -> bool:
         appleGenerated = False
         lastApple = 0
 
+    return False
+
     # Apple not eaten
     return False
 
@@ -1001,13 +1003,11 @@ def checkScore() -> None:
 
     Return => None
     """
-    global score, delay
-    if score % 3 == 0:
-        speedMultiplier = score // 3
-        newDelay = delay - speedMultiplier
-        if newDelay <= 30:
-            newDelay = 30
-        delay = newDelay
+    global score, delay, increaseSpeed
+    if score % 3 == 0 and increaseSpeed:
+        if delay >= 35:
+            delay -= 3
+        increaseSpeed = False
 
 
 def checkWin() -> None:
@@ -1431,6 +1431,7 @@ endless = False
 win = False
 flipSegmentColour = False
 deathAnimation = False
+increaseSpeed = False
 
 # --------------------------------------------------- #
 #
@@ -1511,7 +1512,7 @@ elif endless and restart:
     displayLevel(0, endlessMode=True)
 
 # Sets the roundedness to be proportion to the block size
-# ROUNDEDNESS = int((BLOCK_SIZE * 3) // 25)
+ROUNDEDNESS = int((BLOCK_SIZE * 3) // 25)
 
 while restart:
     # reset time and clock
@@ -1588,7 +1589,9 @@ while restart:
 
         # Checks if the snake has eaten an apple
         if checkApple():
-
+            # if the score is divisible by 3 and increaseSpeed is true,
+            # speed is increased
+            increaseSpeed = True
             # Checks the score to decreases speed if it is necessary
             checkScore()
 
@@ -1625,11 +1628,6 @@ while restart:
         blocksY[0] += stepY
 
         # ------------------------------------------------------------------- #
-
-        # Checks if the player has won
-        # checks before the collision check to avoid scenarios
-        # where the player wins but the collision activates the death animation
-        checkWin()
 
         # Check for collision #################################
         if checkCollision():
