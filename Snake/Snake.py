@@ -28,15 +28,14 @@ ORANGE = (240, 147, 55)
 # PURPLE = (72, 0, 255)
 
 # Menu Colours
-VLCOLOUR = WHITE
-LCOLOUR = WHITE
-NCOLOUR = WHITE
-SCOLOUR = WHITE
+VLCOLOUR = WHITE  # 'Very Large' button color
+LCOLOUR = WHITE  # 'Large' button color
+NCOLOUR = WHITE  # 'Normal' button color
+SCOLOUR = WHITE  # 'Small' button color
 
 # Exit screen colours
-RCOLOUR = WHITE
-ECOLOUR = WHITE
-
+RCOLOUR = WHITE  # 'Restart' button color
+ECOLOUR = WHITE  # 'Exit' button color
 # --------------------------------------------------------------------------- #
 
 # Block size and roundedness
